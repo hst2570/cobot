@@ -1,0 +1,17 @@
+{
+  "name": "vendor_name/package_name",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "author's name",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "irazasyed/telegram-bot-sdk": "^2.0",
+    "longman/telegram-bot": "*",
+    "unreal4u/telegram-api": "~3.0"
+  }
+}
