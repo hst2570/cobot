@@ -10,6 +10,7 @@ class BuyController
     private $coin_type;
     private $offset = 1001;
     private $offsetLength = 200;
+    private $db;
 
     public function __construct($coin_type)
     {
@@ -40,12 +41,13 @@ class BuyController
                     '"'.$item->type.'"',
                     '"'.$item->units_traded.'"',
                     '"'.$item->price.'"',
-                    '"'.$item->total.'"'
+                    '"'.$item->total.'"',
+                    '"'.$this->coin_type.'"'
                 );
 
-                $sql = 'insert into traded_info (transaction_date, type, units_traded, price, total)
+                $sql = 'insert into traded_info (transaction_date, type, units_traded, price, total, coin_type)
                         VALUES (' . implode($value, ',') . ')
-                        on duplicate key update type = '.$value[1];
+                        on duplicate key update type = '.$value[1].', coin_type = '. $value[5];
                 $this->db->query($sql);
             }
         }
