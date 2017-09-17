@@ -1,7 +1,5 @@
 <?php
 
-require_once MAX_PATH . '/env.php';
-
 class XCoinAPI {
     private $api_url = "https://api.bithumb.com";
 

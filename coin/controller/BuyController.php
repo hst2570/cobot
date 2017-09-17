@@ -13,6 +13,7 @@ class BuyController
 
     public function __construct($coin_type)
     {
+        $this->db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
         $this->coin_type = $coin_type;
         $this->api = new XCoinAPI();
     }
@@ -45,7 +46,7 @@ class BuyController
                 $sql = 'insert into traded_info (transaction_date, type, units_traded, price, total)
                         VALUES (' . implode($value, ',') . ')
                         on duplicate key update type = '.$value[1];
-                echo $sql."\n";
+                $this->db->query($sql);
             }
         }
     }
@@ -69,8 +70,8 @@ class BuyController
     private function checkStatus()
     {
         $sql = 'select * from traded_info';
-        $traded_info = '';
+        $traded_info = $this->db->query($sql)->fetch_all();
 
-
+        var_dump($traded_info);
     }
 }
