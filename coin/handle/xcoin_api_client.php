@@ -1,20 +1,16 @@
 <?php
-/* 
- * XCoin API-call related functions
- *
- * @author	btckorea
- * @date	2014-12-30
- */
+
+require_once MAX_PATH . '/env.php';
 
 class XCoinAPI {
-	protected $api_url = "https://api.bithumb.com";
+    private $api_url = "https://api.bithumb.com";
 
-	protected $api_key;
-	protected $api_secret;
+	private $api_key;
+    private $api_secret;
 
-	public function __construct($api_key, $api_secret) {
-		$this->api_key = $api_key;
-		$this->api_secret = $api_secret;
+	public function __construct() {
+		$this->api_key = $GLOBALS['bitsome_api_key'];
+		$this->api_secret = $GLOBALS['bitsome_secret_key'];
 
 	}
 	
@@ -85,7 +81,7 @@ class XCoinAPI {
 	}
 
 
-	public function xcoinApiCall($endpoint, $params=null) {
+	public function xcoinApiCall($endpoint, $params=null, $method = 'POST') {
 		
 		$rgParams = array(
 				'endpoint'	=> $endpoint
@@ -98,7 +94,7 @@ class XCoinAPI {
 		$api_host		= $this->api_url . $endpoint;
 		$httpHeaders	= $this->_getHttpHeaders($endpoint, $rgParams, $this->api_key, $this->api_secret);
 		
-		$rgResult = $this->request($api_host, 'POST', $rgParams, $httpHeaders);
+		$rgResult = $this->request($api_host, $method, $rgParams, $httpHeaders);
 		$rgResultDecode = json_decode($rgResult);
 
 
