@@ -20,8 +20,9 @@ class GetTradeController
 
     public function setCondition()
     {
+		$deleteSql = 'DELETE FROM traded_info WHERE registered_time < DATE_ADD(NOW(), INTERVAL -3 HOUR)';
+		$this->db->query($deleteSql);
         $data = $this->getCondition();
-
         for ($i = 0; $i < sizeof($data); $i++) {
             $traded_date = $data[$i]->data;
             foreach ($traded_date as $item) {
@@ -37,7 +38,7 @@ class GetTradeController
                 $sql = 'insert into traded_info (transaction_date, type, units_traded, price, total, coin_type)
                         VALUES (' . implode($value, ',') . ')
                         on duplicate key update type = ' . $value[1] . ', coin_type = ' . $value[5];
-                $this->db->query($sql);
+				$this->db->query($sql);
             }
         }
     }
@@ -46,7 +47,6 @@ class GetTradeController
     {
         $result = array();
         for ($i = $this->offset; $i > 0; $i = $i - $this->offsetLength) {
-            echo $i . '번째 호출' . date('Y-M-D h:i:s')."\n";
             $rgParams = array(
                 'offset' => $i,
                 'count' => 100
