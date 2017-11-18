@@ -7,7 +7,7 @@ class GetTradeController
     private $recent_transactions = '/public/recent_transactions';
     private $api;
     private $coin_type;
-    private $offset = 301;
+    private $offset = 101;
     private $offsetLength = 5;
     private $db;
 
@@ -20,7 +20,7 @@ class GetTradeController
 
     public function setCondition()
     {
-		$deleteSql = 'DELETE FROM traded_info WHERE registered_time < DATE_ADD(NOW(), INTERVAL -3 HOUR)';
+		$deleteSql = 'DELETE FROM traded_info WHERE registered_time < DATE_ADD(NOW(), INTERVAL -24 HOUR)';
 		$this->db->query($deleteSql);
         $data = $this->getCondition();
         for ($i = 0; $i < sizeof($data); $i++) {

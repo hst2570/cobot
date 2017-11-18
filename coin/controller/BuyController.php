@@ -15,6 +15,6 @@ class BuyController
 
     public function getBuy()
     {
-
+        
     }
 }
