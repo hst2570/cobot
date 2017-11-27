@@ -1,10 +1,15 @@
 <?php
 
+require_once MAX_PATH . '/handle/xcoin_api_client.php';
+
 class BuyController
 {
     private $coin_type;
     private $db;
     private $api;
+    private $account_path = '/info/balance';
+    private $trade_path = '/trade/market_buy';
+    private $current_price = 0;
     private $field = array(
         'traded_info_id',
         'transaction_date',
@@ -20,24 +25,22 @@ class BuyController
     {
         $this->db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
         $this->coin_type = $coin_type;
- //       $this->api = new XCoinAPI();
+        $this->api = new XCoinAPI();
     }
 
     public function getBuy()
     {
-        if ($this->condition()) {
-            echo 'get btc';
-            $date = date(time());
-            $sql = 'insert into test (test) VALUES ('.$date.')';
-            $this->db->query($sql);
-        } else {
+        if (!$this->condition()) {
             echo 'not chance';
+        } else {
+            $this->buyConin();
+            echo '구매완료';
         }
     }
 
     private function condition()
     {
-        $sql = 'select * from traded_info where coin_type = "BTC" order by transaction_date asc';
+        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" order by transaction_date asc';
 
         $result = $this->db->query($sql)->fetch_all();
         $cutline = intval(sizeof($result) / 25);
@@ -68,6 +71,7 @@ class BuyController
         $high = 0;
         $highLoc = 0;
         $currentPrice = $result[sizeof($result)-1][4];
+        $this->current_price = $currentPrice;
 
         for ($i = 0 ; $i < sizeof($average)-1 ; $i++) {
             if ($average[$i] < $low) {
@@ -88,7 +92,7 @@ class BuyController
             return false;
         }
 
-        $is_high = $high > $currentPrice * 1.0035;
+        $is_high = $high > $currentPrice * 1.010;
         $renge_high = 25 - $highLoc > 3;
         $is_low = $low < $currentPrice;
         $renge_low = 25 - $lowLoc > 3;
@@ -97,6 +101,62 @@ class BuyController
             return true;
         } else {
             return false;
+        }
+    }
+
+    private function buyConin()
+    {
+        $rgParams['order_currency'] = $this->coin_type;
+        $rgParams['payment_currency'] = 'KRW';
+        $account = $this->api->xcoinApiCall($this->account_path);
+
+        $current_krw = $account->data->available_krw;
+        if ($current_krw > 1500 ) {
+            return false;
+        }
+
+        $using_krw = $current_krw / 10;
+
+        if ($using_krw > 2000) {
+            $using_krw = $current_krw;
+        }
+        $using_krw = $using_krw / $this->current_price;
+        $trade_params = array(
+            'units' => round($using_krw, 8),
+            'currency' => $this->coin_type
+        );
+        $trade_info = $this->api->xcoinApiCall($this->trade_path, $trade_params);
+        /*
+         * 지갑을 확인하고
+         * 현재금액의 5% 구입
+         * 디비에 정보를 쌓는다
+         * 디비 구조는
+         *
+          `buy_result_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+          `cont_id` mediumint(20) NOT NULL,
+          `units` double DEFAULT NULL,
+          `price` double DEFAULT NULL,
+          `total` double DEFAULT NULL,
+          `fee` double DEFAULT NULL,
+          `sell` double DEFAULT NULL,
+          `coin_type` varchar(32) DEFAULT NULL,
+          `transaction` mediumint(1) DEFAULT NULL, 판매유무
+          `registered_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (`buy_result_id`) USING BTREE
+         */
+        foreach ($trade_info->data as $info) {
+            $value = array(
+                '"'.$info->cont_id.'"',
+                '"'.$info->units.'"',
+                '"'.$info->price.'"',
+                '"'.$info->total.'"',
+                '"'.$info->fee.'"',
+                '"'.$this->coin_type.'"',
+                '"0"',
+            );
+            $sql = 'insert into buy_result (cont_id, units, price, total, fee, coin_type, transaction)
+                VALUES (' . implode($value, ',') . ')';
+            $this->db->query($sql);
         }
     }
 }
