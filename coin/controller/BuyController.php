@@ -20,14 +20,15 @@ class BuyController
     {
         $this->db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
         $this->coin_type = $coin_type;
-        $this->api = new XCoinAPI();
+ //       $this->api = new XCoinAPI();
     }
 
     public function getBuy()
     {
         if ($this->condition()) {
             echo 'get btc';
-            $sql = 'insert into test (test) VALUES (1)';
+            $date = date(time());
+            $sql = 'insert into test (test) VALUES ('.$date.')';
             $this->db->query($sql);
         } else {
             echo 'not chance';
@@ -41,8 +42,9 @@ class BuyController
         $result = $this->db->query($sql)->fetch_all();
         $cutline = intval(sizeof($result) / 25);
         $lineData = array();
+        $tmpArr = array();
 
-        for ($i = 0 ; $i < sizeof($result) ; $i++) {
+        for ($i = 0 ; $i < sizeof($result)-1 ; $i++) {
             array_push($tmpArr, $result[$i]);
             if ($i % $cutline === 0) {
                 array_push($lineData, $tmpArr);
@@ -65,9 +67,9 @@ class BuyController
         $lowLoc = 0;
         $high = 0;
         $highLoc = 0;
-        $currentPrice = $result[sizeof($result)][4];
+        $currentPrice = $result[sizeof($result)-1][4];
 
-        for ($i = 0 ; $i < sizeof($average) ; $i++) {
+        for ($i = 0 ; $i < sizeof($average)-1 ; $i++) {
             if ($average[$i] < $low) {
                 $low = $average[$i];
                 $lowLoc = $i;
@@ -86,10 +88,10 @@ class BuyController
             return false;
         }
 
-        $is_high = $high > $currentPrice * 1.005;
-        $renge_high = $highLoc - 25 > 3;
+        $is_high = $high > $currentPrice * 1.0035;
+        $renge_high = 25 - $highLoc > 3;
         $is_low = $low < $currentPrice;
-        $renge_low = $lowLoc - 25 > 3;
+        $renge_low = 25 - $lowLoc > 3;
 
         if ($is_high && $is_low && $renge_high &&$renge_low) {
             return true;
