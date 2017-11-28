@@ -26,15 +26,16 @@ class SellController
         $current_coin_call = $trade_info = $this->api->xcoinApiCall($this->current_price_path.$this->coin_type);
         $current_coin_info = $current_coin_call->data;
         $current_coin_price = $current_coin_info->sell_price;
-
+var_dump($no_sell_data);
         foreach ($no_sell_data as $data) {
-            if ($current_coin_price > $data[3] * 1.001) {
+            if ($current_coin_price > $data[2] * 1.010) {
                 $param = array(
-                    'units' => $data[2],
+                    'units' => $data[1],
                     'currency' => $this->coin_type
                 );
+var_dump($param);
                 $sell_info = $trade_info = $this->api->xcoinApiCall($this->sell_path, $param);
-
+var_dump($sell_info);
                 foreach ($sell_info->data as $info) {
                     /*
                      * sell_result | CREATE TABLE `sell_result` (
@@ -51,18 +52,17 @@ class SellController
                     ) ENGINE=InnoDB DEFAULT CHARSET=latin1 |
                      */
                     $value = array(
-                        '"'.$info->cont_id.'"',
-                        '"'.$info->units.'"',
-                        '"'.$info->price.'"',
-                        '"'.$info->total.'"',
-                        '"'.$info->fee.'"',
+                        $info->units,
+                        $info->price,
+                        $info->total,
+                        $info->fee,
                         '"'.$this->coin_type.'"',
                     );
-                    $sql = 'insert into sell_result (cont_id, units, price, total, fee, coin_type)
+                    $sql = 'insert into sell_result (units, price, total, fee, coin_type)
                             VALUES (' . implode($value, ',') . ')';
                     $this->db->query($sql);
 
-                    $sql = 'update buy_result set transaction = 1 where buy_result_id = "'.$data[0].'"';
+                    $sql = 'update buy_result set transaction = 1 where buy_result_id = '.$data[0];
                     $this->db->query($sql);
                 }
             }

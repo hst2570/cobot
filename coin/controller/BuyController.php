@@ -33,8 +33,8 @@ class BuyController
         if (!$this->condition()) {
             echo 'not chance';
         } else {
+//$this->current_price = 11150000;
             $this->buyConin();
-            echo '구매완료';
         }
     }
 
@@ -60,7 +60,7 @@ class BuyController
 
         foreach ($lineData as $key => $items) {
             foreach ($items as $item) {
-                $sum = $sum + $item[4];
+                $sum = $sum + $item[3];
             }
             array_push($average, $sum / sizeof($items));
             $sum = 0;
@@ -70,7 +70,7 @@ class BuyController
         $lowLoc = 0;
         $high = 0;
         $highLoc = 0;
-        $currentPrice = $result[sizeof($result)-1][4];
+        $currentPrice = $result[sizeof($result)-1][3];
         $this->current_price = $currentPrice;
 
         for ($i = 0 ; $i < sizeof($average)-1 ; $i++) {
@@ -84,11 +84,17 @@ class BuyController
             }
         }
 
-        if ($high > $low * 1.06) {
+        if ($high > $low * 1.10) {
+echo $high. "\n";
+echo $low. "\n";
+echo '폭락';
             return false;
         }
 
-        if ($high > $currentPrice * 1.06) {
+        if ($high > $currentPrice * 1.10) {
+echo $high. "\n";
+echo $currentPrice. "\n";
+echo '폭락2';
             return false;
         }
 
@@ -97,9 +103,19 @@ class BuyController
         $is_low = $low < $currentPrice;
         $renge_low = 25 - $lowLoc > 3;
 
-        if ($is_high && $is_low && $renge_high &&$renge_low) {
+        if ($is_high && $is_low && $renge_high && $renge_low) {
             return true;
         } else {
+echo $high. "\n";
+echo $low. "\n";
+echo $currentPrice. "\n";
+echo $highLoc. "\n";
+echo $lowLoc. "\n";
+
+var_dump($is_high);
+var_dump($is_low);
+var_dump($renge_high);
+var_dump($renge_low);
             return false;
         }
     }
@@ -109,23 +125,31 @@ class BuyController
         $rgParams['order_currency'] = $this->coin_type;
         $rgParams['payment_currency'] = 'KRW';
         $account = $this->api->xcoinApiCall($this->account_path);
-
         $current_krw = $account->data->available_krw;
-        if ($current_krw > 1500 ) {
-            return false;
+
+        if ($current_krw < 1500 ) {
+		echo '예산 부족';            
+		return false;
         }
 
-        $using_krw = $current_krw / 10;
+        $using_krw = $current_krw / 7;
 
-        if ($using_krw > 2000) {
+        if ($using_krw < 2000) {
             $using_krw = $current_krw;
         }
         $using_krw = $using_krw / $this->current_price;
+echo $current_krw;
+if (round($using_krw, 4) < 0.001) {
+echo $current_krw / $this->current_price;
+$using_krw = $current_krw / $this->current_price;
+}
         $trade_params = array(
-            'units' => round($using_krw, 8),
+            'units' => round($using_krw, 4),
             'currency' => $this->coin_type
         );
+var_dump($trade_params);
         $trade_info = $this->api->xcoinApiCall($this->trade_path, $trade_params);
+var_dump($trade_info);
         /*
          * 지갑을 확인하고
          * 현재금액의 5% 구입
@@ -146,17 +170,18 @@ class BuyController
          */
         foreach ($trade_info->data as $info) {
             $value = array(
-                '"'.$info->cont_id.'"',
-                '"'.$info->units.'"',
-                '"'.$info->price.'"',
-                '"'.$info->total.'"',
-                '"'.$info->fee.'"',
+                $info->units,
+                $info->price,
+                $info->total,
+                $info->fee,
                 '"'.$this->coin_type.'"',
-                '"0"',
+                0,
             );
-            $sql = 'insert into buy_result (cont_id, units, price, total, fee, coin_type, transaction)
+            $sql = 'insert into buy_result (units, price, total, fee, coin_type, transaction)
                 VALUES (' . implode($value, ',') . ')';
-            $this->db->query($sql);
+var_dump($sql);
+            var_dump($this->db->query($sql));
         }
+	echo '구매완료';
     }
 }
