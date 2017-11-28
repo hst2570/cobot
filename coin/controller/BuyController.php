@@ -74,19 +74,26 @@ class BuyController
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
         $renge_high = 25 - $highLoc > 3;
         $is_low = $low < $this->current_price;
+        $already_low = $average[count($average)-2] > $this->current_price && $average[count($average)-1] > $this->current_price;
+        $is_low_average_value = ($high + $low) / 2 > $this->current_price;
 
-        if ($is_high && $is_low && $renge_high) {
+        if ($is_high && $is_low && $renge_high && !$already_low && $is_low_average_value) {
             return true;
         } else {
-            echo $high. "\n";
-            echo $low. "\n";
-            echo $this->current_price. "\n";
-            echo $highLoc. "\n";
-            echo $lowLoc. "\n";
+            echo '최고가: '.$high. "\n";
+            echo '최저가: '.$low. "\n";
+            echo '현재전가: '.$average[count($average)-1] . "\n";
+            echo '현재전전가: '.$average[count($average)-2] . "\n";
+            echo '현재가: '.$this->current_price. "\n";
+            echo '현재가와 최고가 틱차이: '.$highLoc. "\n";
+            echo '현재가와 최저가 틱차이: '.$lowLoc. "\n";
+            echo '최고가 최저가 평균: '.($high + $low) / 2;
 
             var_dump($is_high);
             var_dump($is_low);
             var_dump($renge_high);
+            var_dump(!$already_low);
+            var_dump($is_low_average_value);
             return false;
         }
     }
