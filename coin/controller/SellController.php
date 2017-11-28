@@ -1,6 +1,7 @@
 <?php
 
 require_once MAX_PATH . '/handle/xcoin_api_client.php';
+require_once MAX_PATH . '/controller/BuyController.php';
 
 class SellController
 {
@@ -26,16 +27,28 @@ class SellController
         $current_coin_call = $trade_info = $this->api->xcoinApiCall($this->current_price_path.$this->coin_type);
         $current_coin_info = $current_coin_call->data;
         $current_coin_price = $current_coin_info->sell_price;
-var_dump($no_sell_data);
+
+        var_dump($no_sell_data);
+
         foreach ($no_sell_data as $data) {
-            if ($current_coin_price > $data[2] * 1.010) {
+            if ($current_coin_price > $data[2] * $GLOBALS['sell_fee']) {
+                $buy = new BuyController($this->coin_type);
+                $average = $buy->getAverageData();
+
+                if ($average[count($average) - 1] < $current_coin_price) {
+                    echo '상승중!!!!';
+                    continue;
+                }
+
                 $param = array(
                     'units' => $data[1],
                     'currency' => $this->coin_type
                 );
-var_dump($param);
+                var_dump($param);
+
                 $sell_info = $trade_info = $this->api->xcoinApiCall($this->sell_path, $param);
-var_dump($sell_info);
+
+                var_dump($sell_info);
                 foreach ($sell_info->data as $info) {
                     /*
                      * sell_result | CREATE TABLE `sell_result` (

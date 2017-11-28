@@ -33,45 +33,18 @@ class BuyController
         if (!$this->condition()) {
             echo 'not chance';
         } else {
-//$this->current_price = 11150000;
             $this->buyConin();
         }
     }
 
     private function condition()
     {
-        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" order by transaction_date asc';
-
-        $result = $this->db->query($sql)->fetch_all();
-        $cutline = intval(sizeof($result) / 25);
-        $lineData = array();
-        $tmpArr = array();
-
-        for ($i = 0 ; $i < sizeof($result)-1 ; $i++) {
-            array_push($tmpArr, $result[$i]);
-            if ($i % $cutline === 0) {
-                array_push($lineData, $tmpArr);
-                $tmpArr = array();
-            }
-        }
-
-        $average = array();
-        $sum = 0;
-
-        foreach ($lineData as $key => $items) {
-            foreach ($items as $item) {
-                $sum = $sum + $item[3];
-            }
-            array_push($average, $sum / sizeof($items));
-            $sum = 0;
-        }
+        $average = $this->getAverageData();
 
         $low = 99999999999;
         $lowLoc = 0;
         $high = 0;
         $highLoc = 0;
-        $currentPrice = $result[sizeof($result)-1][3];
-        $this->current_price = $currentPrice;
 
         for ($i = 0 ; $i < sizeof($average)-1 ; $i++) {
             if ($average[$i] < $low) {
@@ -85,37 +58,35 @@ class BuyController
         }
 
         if ($high > $low * 1.10) {
-echo $high. "\n";
-echo $low. "\n";
-echo '폭락';
+            echo $high. "\n";
+            echo $low. "\n";
+            echo '폭락';
             return false;
         }
 
-        if ($high > $currentPrice * 1.10) {
-echo $high. "\n";
-echo $currentPrice. "\n";
-echo '폭락2';
+        if ($high > $this->current_price * 1.10) {
+            echo $high. "\n";
+            echo $this->current_price. "\n";
+            echo '폭락2';
             return false;
         }
 
-        $is_high = $high > $currentPrice * 1.010;
+        $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
         $renge_high = 25 - $highLoc > 3;
-        $is_low = $low < $currentPrice;
-        $renge_low = 25 - $lowLoc > 3;
+        $is_low = $low < $this->current_price;
 
-        if ($is_high && $is_low && $renge_high && $renge_low) {
+        if ($is_high && $is_low && $renge_high) {
             return true;
         } else {
-echo $high. "\n";
-echo $low. "\n";
-echo $currentPrice. "\n";
-echo $highLoc. "\n";
-echo $lowLoc. "\n";
+            echo $high. "\n";
+            echo $low. "\n";
+            echo $this->current_price. "\n";
+            echo $highLoc. "\n";
+            echo $lowLoc. "\n";
 
-var_dump($is_high);
-var_dump($is_low);
-var_dump($renge_high);
-var_dump($renge_low);
+            var_dump($is_high);
+            var_dump($is_low);
+            var_dump($renge_high);
             return false;
         }
     }
@@ -127,29 +98,27 @@ var_dump($renge_low);
         $account = $this->api->xcoinApiCall($this->account_path);
         $current_krw = $account->data->available_krw;
 
-        if ($current_krw < 1500 ) {
-		echo '예산 부족';            
-		return false;
-        }
-
         $using_krw = $current_krw / 7;
 
-        if ($using_krw < 2000) {
+        if ($current_krw < 15000 ) {
             $using_krw = $current_krw;
         }
+
         $using_krw = $using_krw / $this->current_price;
-echo $current_krw;
-if (round($using_krw, 4) < 0.001) {
-echo $current_krw / $this->current_price;
-$using_krw = $current_krw / $this->current_price;
-}
+
+        echo $current_krw;
+
+        if (round($using_krw, 4) < 0.001) {
+            echo $current_krw / $this->current_price;
+            $using_krw = $current_krw / $this->current_price;
+        }
         $trade_params = array(
             'units' => round($using_krw, 4),
             'currency' => $this->coin_type
         );
-var_dump($trade_params);
+        var_dump($trade_params);
         $trade_info = $this->api->xcoinApiCall($this->trade_path, $trade_params);
-var_dump($trade_info);
+        var_dump($trade_info);
         /*
          * 지갑을 확인하고
          * 현재금액의 5% 구입
@@ -157,7 +126,6 @@ var_dump($trade_info);
          * 디비 구조는
          *
           `buy_result_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-          `cont_id` mediumint(20) NOT NULL,
           `units` double DEFAULT NULL,
           `price` double DEFAULT NULL,
           `total` double DEFAULT NULL,
@@ -168,6 +136,13 @@ var_dump($trade_info);
           `registered_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (`buy_result_id`) USING BTREE
          */
+        $sql = 'select registered_time from buy_result order by desc';
+        $last_register = $this->db->query($sql)->fetch_all();
+
+        if ((strtotime($last_register) + $GLOBALS['buy_term']) > time()) {
+            echo '최근 구매';
+            return false;
+        }
         foreach ($trade_info->data as $info) {
             $value = array(
                 $info->units,
@@ -179,9 +154,47 @@ var_dump($trade_info);
             );
             $sql = 'insert into buy_result (units, price, total, fee, coin_type, transaction)
                 VALUES (' . implode($value, ',') . ')';
-var_dump($sql);
+
             var_dump($this->db->query($sql));
         }
-	echo '구매완료';
+	    echo '구매완료';
+    }
+
+    public function getAverageData()
+    {
+        $average = array();
+        $result = $this->getTraded();
+
+        $this->current_price = $result[sizeof($result)-1][3];
+
+        $cutline = intval(sizeof($result) / 25);
+        $lineData = array();
+        $tmpArr = array();
+
+        for ($i = 0 ; $i < sizeof($result)-1 ; $i++) {
+            array_push($tmpArr, $result[$i]);
+            if ($i % $cutline === 0) {
+                array_push($lineData, $tmpArr);
+                $tmpArr = array();
+            }
+        }
+        $sum = 0;
+
+        foreach ($lineData as $key => $items) {
+            foreach ($items as $item) {
+                $sum = $sum + $item[3];
+            }
+            array_push($average, $sum / sizeof($items));
+            $sum = 0;
+        }
+
+        return $average;
+    }
+
+    private function getTraded()
+    {
+        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" order by transaction_date asc';
+
+        return $this->db->query($sql)->fetch_all();
     }
 }
