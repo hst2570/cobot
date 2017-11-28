@@ -72,7 +72,7 @@ class BuyController
         }
 
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
-        $renge_high = 25 - $highLoc > 3;
+        $renge_high = 25 - $highLoc > 10;
         $is_low = $low < $this->current_price;
         $already_low = $average[count($average)-2] > $this->current_price && $average[count($average)-1] > $this->current_price;
         $is_low_average_value = ($high + $low) / 2 > $this->current_price;
