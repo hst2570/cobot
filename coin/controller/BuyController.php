@@ -112,6 +112,15 @@ class BuyController
             echo $current_krw / $this->current_price;
             $using_krw = $current_krw / $this->current_price;
         }
+$sql = 'select registered_time from buy_result where coin_type = "'.$this->coin_type.'" order by registered_time desc limit 1';
+        $last_register = $this->db->query($sql)->fetch_all();
+var_dump($last_register);
+var_dump(strtotime($last_register[0][0]) + $GLOBALS['buy_term'], time());
+$register_time = strtotime($last_register[0][0]);
+        if ($register_time + $GLOBALS['buy_term'] > time()) {
+            echo '최근 구매';
+            return false;
+        }
         $trade_params = array(
             'units' => round($using_krw, 4),
             'currency' => $this->coin_type
@@ -136,13 +145,6 @@ class BuyController
           `registered_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (`buy_result_id`) USING BTREE
          */
-        $sql = 'select registered_time from buy_result order by desc';
-        $last_register = $this->db->query($sql)->fetch_all();
-
-        if ((strtotime($last_register) + $GLOBALS['buy_term']) > time()) {
-            echo '최근 구매';
-            return false;
-        }
         foreach ($trade_info->data as $info) {
             $value = array(
                 $info->units,
