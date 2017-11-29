@@ -72,28 +72,37 @@ class BuyController
         }
 
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
-        $renge_high = 25 - $highLoc > 10;
+        $renge_high = 25 - $highLoc > 2;
         $is_low = $low < $this->current_price;
         $already_low = $average[count($average)-2] > $this->current_price && $average[count($average)-1] > $this->current_price;
         $is_low_average_value = ($high + $low) / 2 > $this->current_price;
 
-        if ($is_high && $is_low && $renge_high && !$already_low && $is_low_average_value) {
-            return true;
-        } else {
             echo '최고가: '.$high. "\n";
             echo '최저가: '.$low. "\n";
             echo '현재전가: '.$average[count($average)-1] . "\n";
             echo '현재전전가: '.$average[count($average)-2] . "\n";
             echo '현재가: '.$this->current_price. "\n";
-            echo '현재가와 최고가 틱차이: '.$highLoc. "\n";
-            echo '현재가와 최저가 틱차이: '.$lowLoc. "\n";
+        $high_loc_current = 25 - $highLoc;
+            echo '현재가와 최고가 틱차이: '.$high_loc_current. "\n";
+        $low_loc_current = 25 - $lowLoc;
+            echo '현재가와 최저가 틱차이: '.$low_loc_current. "\n";
             echo '최고가 최저가 평균: '.($high + $low) / 2;
-
+            echo "\n\n";
+            
+            echo "최고가인가?";
             var_dump($is_high);
+            echo "최저가보다 증가해야한다";
             var_dump($is_low);
+            echo "최고가와 시간차가 좀 나야한다";
             var_dump($renge_high);
+            echo "여전히 떨어지고 있는가?";
             var_dump(!$already_low);
+            echo "최고 최저 평균보다 현재값이 낮아야한다";
             var_dump($is_low_average_value);
+
+        if ($is_high && $is_low && $renge_high && !$already_low && $is_low_average_value) {
+            return true;
+        } else {
             return false;
         }
     }

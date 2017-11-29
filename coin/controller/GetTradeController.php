@@ -20,7 +20,7 @@ class GetTradeController
 
     public function setCondition()
     {
-		$deleteSql = 'DELETE FROM traded_info WHERE registered_time < DATE_ADD(NOW(), INTERVAL -5 HOUR)';
+		$deleteSql = 'DELETE FROM traded_info WHERE registered_time < DATE_ADD(NOW(), INTERVAL -3 HOUR)';
 		$this->db->query($deleteSql);
         $data = $this->getCondition();
         for ($i = 0; $i < sizeof($data); $i++) {
