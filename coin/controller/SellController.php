@@ -41,7 +41,7 @@ class SellController
                 }
 
                 $param = array(
-                    'units' => $data[1],
+                    'units' => round($data[1] - $data[4], 4),
                     'currency' => $this->coin_type
                 );
                 var_dump($param);
@@ -78,6 +78,7 @@ class SellController
                     $sql = 'update buy_result set transaction = 1 where buy_result_id = '.$data[0];
                     $this->db->query($sql);
                 }
+                echo $data[0]. " 판매완료\n";
             }
         }
     }

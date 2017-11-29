@@ -72,7 +72,7 @@ class BuyController
         }
 
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
-        $renge_high = 25 - $highLoc > 2;
+        $renge_high = 18 - $highLoc > 2;
         $is_low = $low < $this->current_price;
         $already_low = $average[count($average)-2] > $this->current_price && $average[count($average)-1] > $this->current_price;
         $is_low_average_value = ($high + $low) / 2 > $this->current_price;
@@ -82,9 +82,9 @@ class BuyController
             echo '현재전가: '.$average[count($average)-1] . "\n";
             echo '현재전전가: '.$average[count($average)-2] . "\n";
             echo '현재가: '.$this->current_price. "\n";
-        $high_loc_current = 25 - $highLoc;
+        $high_loc_current = 18 - $highLoc;
             echo '현재가와 최고가 틱차이: '.$high_loc_current. "\n";
-        $low_loc_current = 25 - $lowLoc;
+        $low_loc_current = 18 - $lowLoc;
             echo '현재가와 최저가 틱차이: '.$low_loc_current. "\n";
             echo '최고가 최저가 평균: '.($high + $low) / 2;
             echo "\n\n";
@@ -114,7 +114,7 @@ class BuyController
         $account = $this->api->xcoinApiCall($this->account_path);
         $current_krw = $account->data->available_krw;
 
-        $using_krw = $current_krw / 7;
+        $using_krw = $current_krw / 10;
 
         if ($current_krw < 15000 ) {
             $using_krw = $current_krw;
@@ -185,7 +185,7 @@ $register_time = strtotime($last_register[0][0]);
 
         $this->current_price = $result[sizeof($result)-1][3];
 
-        $cutline = intval(sizeof($result) / 25);
+        $cutline = intval(sizeof($result) / 18);
         $lineData = array();
         $tmpArr = array();
 
