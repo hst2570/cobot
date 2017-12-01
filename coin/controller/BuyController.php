@@ -29,6 +29,7 @@ class BuyController
         $this->coin_type = $coin_type;
         $this->api = new XCoinAPI();
         $this->coin_status = new CoinStatus($coin_type);
+        $this->current_price = $this->coin_status->currentPrice();
     }
 
     public function getBuy()

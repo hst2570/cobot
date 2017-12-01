@@ -113,4 +113,12 @@ class CoinStatus
 
         return false;
     }
+
+    public function currentPrice()
+    {
+        $result = $this->getTraded();
+
+        $this->current_price = $result[sizeof($result)-1][3];
+        return $this->current_price;
+    }
 }
