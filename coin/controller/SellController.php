@@ -1,7 +1,7 @@
 <?php
 
 require_once MAX_PATH . '/handle/xcoin_api_client.php';
-require_once MAX_PATH . '/controller/BuyController.php';
+require_once MAX_PATH . '/service/CoinStatus.php';
 
 class SellController
 {
@@ -10,12 +10,14 @@ class SellController
     private $api;
     private $current_price_path = '/public/ticker/';
     private $sell_path = '/trade/market_sell';
+    private $coin_status;
 
     public function __construct($coin_type)
     {
         $this->db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
         $this->coin_type = $coin_type;
         $this->api = new XCoinAPI();
+        $this->coin_status = new CoinStatus($coin_type);
     }
 
     public function sell()
@@ -31,55 +33,64 @@ class SellController
         var_dump($no_sell_data);
 
         foreach ($no_sell_data as $data) {
-            if ($current_coin_price > $data[2] * $GLOBALS['sell_fee']) {
-                $buy = new BuyController($this->coin_type);
-                $average = $buy->getAverageData();
+            $price = $data[2];
+            $units = round($data[1] - $data[4], 4);
+            $buy_result_id = $data[0];
 
-                if ($average[count($average) - 1] < $current_coin_price) {
+            $param = array(
+                'units' => $units,
+                'currency' => $this->coin_type
+            );
+
+            if ($GLOBALS['cut_stop_motion'] === true) {
+                if ($current_coin_price >= $price * 0.98) {
+                    $this->stop_motion($param, $buy_result_id);
+                }
+            }
+
+            if ($current_coin_price > $price * $GLOBALS['sell_fee']) {
+                if ($this->coin_status->isAlreadyUpStatus()) {
                     echo '상승중!!!!';
                     continue;
                 }
-
-                $param = array(
-                    'units' => round($data[1] - $data[4], 4),
-                    'currency' => $this->coin_type
-                );
                 var_dump($param);
 
-                $sell_info = $trade_info = $this->api->xcoinApiCall($this->sell_path, $param);
-
-                var_dump($sell_info);
-                foreach ($sell_info->data as $info) {
-                    /*
-                     * sell_result | CREATE TABLE `sell_result` (
-                      `sell_result_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-                      `cont_id` mediumint(20) NOT NULL,
-                      `units` double DEFAULT NULL,
-                      `price` double DEFAULT NULL,
-                      `total` double DEFAULT NULL,
-                      `fee` double DEFAULT NULL,
-                      `sell` double DEFAULT NULL,
-                      `coin_type` varchar(32) DEFAULT NULL,
-                      `registered_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                      PRIMARY KEY (`sell_result_id`) USING BTREE
-                    ) ENGINE=InnoDB DEFAULT CHARSET=latin1 |
-                     */
-                    $value = array(
-                        $info->units,
-                        $info->price,
-                        $info->total,
-                        $info->fee,
-                        '"'.$this->coin_type.'"',
-                    );
-                    $sql = 'insert into sell_result (units, price, total, fee, coin_type)
-                            VALUES (' . implode($value, ',') . ')';
-                    $this->db->query($sql);
-
-                    $sql = 'update buy_result set transaction = 1 where buy_result_id = '.$data[0];
-                    $this->db->query($sql);
-                }
+                $this->sell_coin($param, $buy_result_id);
                 echo $data[0]. " 판매완료\n";
             }
+        }
+    }
+
+    private function stop_motion($param, $buy_result_id)
+    {
+        if ($this->coin_status->isAlreadyDropStatus() &&
+            !$this->coin_status->isAlreadyUpStatus()) {
+            echo "하락장!! 손절을 시작합니다.\n\n";
+            $this->sell_coin($param, $buy_result_id);
+        }
+    }
+
+    private function sell_coin($param, $buy_result_id)
+    {
+        $sell_info = $trade_info = $this->api->xcoinApiCall($this->sell_path, $param);
+
+        var_dump($sell_info);
+
+        foreach ($sell_info->data as $info) {
+
+            $value = array(
+                $info->units,
+                $info->price,
+                $info->total,
+                $info->fee,
+                '"' . $this->coin_type . '"',
+            );
+            $sql = 'insert into sell_result (units, price, total, fee, coin_type)
+                            VALUES (' . implode($value, ',') . ')';
+            $this->db->query($sql);
+
+            $sql = 'update buy_result set transaction = 1 where buy_result_id = ' . $buy_result_id;
+            $this->db->query($sql);
         }
     }
 }

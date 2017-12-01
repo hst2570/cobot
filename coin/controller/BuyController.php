@@ -1,6 +1,7 @@
 <?php
 
 require_once MAX_PATH . '/handle/xcoin_api_client.php';
+require_once MAX_PATH . '/service/CoinStatus.php';
 
 class BuyController
 {
@@ -10,6 +11,7 @@ class BuyController
     private $account_path = '/info/balance';
     private $trade_path = '/trade/market_buy';
     private $current_price = 0;
+    private $coin_status;
     private $field = array(
         'traded_info_id',
         'transaction_date',
@@ -26,12 +28,13 @@ class BuyController
         $this->db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
         $this->coin_type = $coin_type;
         $this->api = new XCoinAPI();
+        $this->coin_status = new CoinStatus($coin_type);
     }
 
     public function getBuy()
     {
         if (!$this->condition()) {
-            echo 'not chance';
+            echo "\n\n not chance \n\n";
         } else {
             $this->buyConin();
         }
@@ -39,7 +42,7 @@ class BuyController
 
     private function condition()
     {
-        $average = $this->getAverageData();
+        $average = $this->coin_status->getAverageData();
 
         $low = 99999999999;
         $lowLoc = 0;
@@ -57,50 +60,46 @@ class BuyController
             }
         }
 
-        if ($high > $low * 1.10) {
-            echo $high. "\n";
-            echo $low. "\n";
-            echo '폭락';
-            return false;
-        }
-
-        if ($high > $this->current_price * 1.10) {
-            echo $high. "\n";
-            echo $this->current_price. "\n";
-            echo '폭락2';
-            return false;
-        }
-
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
-        $renge_high = 18 - $highLoc > 2;
-        $is_low = $low < $this->current_price;
-        $already_low = $average[count($average)-2] > $this->current_price && $average[count($average)-1] > $this->current_price;
-        $is_low_average_value = ($high + $low) / 2 > $this->current_price;
+        $renge_high = $GLOBALS['data_div_count'] - $highLoc > 2;
+        $already_low = $this->coin_status->isAlreadyDropStatus();
+        $is_low_average_value = ($high + $low) / 2 > $this->current_price * 0.99;
 
-            echo '최고가: '.$high. "\n";
-            echo '최저가: '.$low. "\n";
-            echo '현재전가: '.$average[count($average)-1] . "\n";
-            echo '현재전전가: '.$average[count($average)-2] . "\n";
-            echo '현재가: '.$this->current_price. "\n";
-        $high_loc_current = 18 - $highLoc;
-            echo '현재가와 최고가 틱차이: '.$high_loc_current. "\n";
-        $low_loc_current = 18 - $lowLoc;
-            echo '현재가와 최저가 틱차이: '.$low_loc_current. "\n";
-            echo '최고가 최저가 평균: '.($high + $low) / 2;
-            echo "\n\n";
-            
-            echo "최고가인가?";
-            var_dump($is_high);
-            echo "최저가보다 증가해야한다";
-            var_dump($is_low);
-            echo "최고가와 시간차가 좀 나야한다";
-            var_dump($renge_high);
-            echo "여전히 떨어지고 있는가?";
-            var_dump(!$already_low);
-            echo "최고 최저 평균보다 현재값이 낮아야한다";
-            var_dump($is_low_average_value);
+        echo '최고가: '.$high. "\n";
+        echo '최저가: '.$low. "\n";
+        echo '현재전가: '.$average[count($average)-1] . "\n";
+        echo '현재전전가: '.$average[count($average)-2] . "\n";
+        echo '현재가: '.$this->current_price. "\n";
+        $high_loc_current = $GLOBALS['data_div_count'] - $highLoc;
+        echo '현재가와 최고가 틱차이: '.$high_loc_current. "\n";
+        $low_loc_current = $GLOBALS['data_div_count'] - $lowLoc;
+        echo '현재가와 최저가 틱차이: '.$low_loc_current. "\n";
+        echo '최고가 최저가 평균: '.($high + $low) / 2;
+        echo "\n\n";
 
-        if ($is_high && $is_low && $renge_high && !$already_low && $is_low_average_value) {
+        echo "최고가인가?";
+        var_dump($is_high);
+        echo "최고가와 시간차가 좀 나야한다";
+        var_dump($renge_high);
+        echo "여전히 떨어지고 있는가?";
+        var_dump($already_low);
+        echo "최고 최저 평균보다 현재값이 낮아야한다";
+        var_dump($is_low_average_value);
+
+        if ($is_high && $renge_high && !$already_low && $is_low_average_value) {
+            if ($high > $low * $GLOBALS['is_very_drop_per']) {
+                echo $high. "\n";
+                echo $low. "\n";
+                echo "폭락\n\n";
+                return false;
+            }
+
+            if ($high > $this->current_price * $GLOBALS['is_very_drop_per']) {
+                echo $high. "\n";
+                echo $this->current_price. "\n";
+                echo "폭락22\n\n";
+                return false;
+            }
             return true;
         } else {
             return false;
@@ -114,7 +113,7 @@ class BuyController
         $account = $this->api->xcoinApiCall($this->account_path);
         $current_krw = $account->data->available_krw;
 
-        $using_krw = $current_krw / 10;
+        $using_krw = $current_krw / $GLOBALS['budget_div'];
 
         if ($current_krw < 15000 ) {
             $using_krw = $current_krw;
@@ -124,15 +123,25 @@ class BuyController
 
         echo $current_krw;
 
-        if (round($using_krw, 4) < 0.001) {
+        $min_units = array(
+            'BTC' => 0.001,
+            'XRP' => 10,
+            'ETH' => 0.1,
+            'ETC' => 0.1,
+            'LTC' => 0.1,
+        );
+
+        if (round($using_krw, 4) < $min_units[$this->coin_type]) {
             echo $current_krw / $this->current_price;
             $using_krw = $current_krw / $this->current_price;
         }
-$sql = 'select registered_time from buy_result where coin_type = "'.$this->coin_type.'" order by registered_time desc limit 1';
-        $last_register = $this->db->query($sql)->fetch_all();
-var_dump($last_register);
-var_dump(strtotime($last_register[0][0]) + $GLOBALS['buy_term'], time());
-$register_time = strtotime($last_register[0][0]);
+
+        $sql = 'select registered_time from buy_result where coin_type = "'.$this->coin_type.'" order by registered_time desc limit 1';
+                $last_register = $this->db->query($sql)->fetch_all();
+        var_dump($last_register);
+        var_dump(strtotime($last_register[0][0]) + $GLOBALS['buy_term'], time());
+
+        $register_time = strtotime($last_register[0][0]);
         if ($register_time + $GLOBALS['buy_term'] > time()) {
             echo '최근 구매';
             return false;
@@ -176,43 +185,5 @@ $register_time = strtotime($last_register[0][0]);
             var_dump($this->db->query($sql));
         }
 	    echo '구매완료';
-    }
-
-    public function getAverageData()
-    {
-        $average = array();
-        $result = $this->getTraded();
-
-        $this->current_price = $result[sizeof($result)-1][3];
-
-        $cutline = intval(sizeof($result) / 18);
-        $lineData = array();
-        $tmpArr = array();
-
-        for ($i = 0 ; $i < sizeof($result)-1 ; $i++) {
-            array_push($tmpArr, $result[$i]);
-            if ($i % $cutline === 0) {
-                array_push($lineData, $tmpArr);
-                $tmpArr = array();
-            }
-        }
-        $sum = 0;
-
-        foreach ($lineData as $key => $items) {
-            foreach ($items as $item) {
-                $sum = $sum + $item[3];
-            }
-            array_push($average, $sum / sizeof($items));
-            $sum = 0;
-        }
-
-        return $average;
-    }
-
-    private function getTraded()
-    {
-        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" order by transaction_date asc';
-
-        return $this->db->query($sql)->fetch_all();
     }
 }
