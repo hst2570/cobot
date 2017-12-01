@@ -49,10 +49,16 @@ class SellController
             }
 
             if ($current_coin_price > $price * $GLOBALS['sell_fee']) {
-                if ($this->coin_status->isAlreadyUpStatus()) {
+                if ($this->coin_status->isStartedUpStatus()) {
+                    echo '상승장 시작!!!!';
+                    continue;
+                }
+
+                if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()) {
                     echo '상승중!!!!';
                     continue;
                 }
+
                 var_dump($param);
 
                 $this->sell_coin($param, $buy_result_id);
@@ -64,7 +70,7 @@ class SellController
     private function stop_motion($param, $buy_result_id)
     {
         if ($this->coin_status->isAlreadyDropStatus() &&
-            !$this->coin_status->isAlreadyUpStatus()) {
+            !$this->coin_status->isStartedUpStatus()) {
             echo "하락장!! 손절을 시작합니다.\n\n";
             $this->sell_coin($param, $buy_result_id);
         }

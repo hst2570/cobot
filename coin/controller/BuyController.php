@@ -65,6 +65,7 @@ class BuyController
         $renge_high = $GLOBALS['data_div_count'] - $highLoc > 2;
         $already_low = $this->coin_status->isAlreadyDropStatus();
         $is_low_average_value = ($high + $low) / 2 > $this->current_price * 0.99;
+        $started_drop = $this->coin_status->isStartedDropStatus();
 
         echo '최고가: '.$high. "\n";
         echo '최저가: '.$low. "\n";
@@ -86,6 +87,23 @@ class BuyController
         var_dump($already_low);
         echo "최고 최저 평균보다 현재값이 낮아야한다";
         var_dump($is_low_average_value);
+        echo "하락장 초입인가?";
+        var_dump($started_drop);
+
+        if ($started_drop) {
+            $current_prices_size = intval(sizeof($average) * 0.70);
+            $step_drop_status = 0;
+
+            for ($i = $current_prices_size ; $i < sizeof($average)-1 ; $i++) {
+                if ($average[$current_prices_size] > $average[$current_prices_size + 1] * 1.02) {
+                    $step_drop_status++;
+                }
+            }
+            if ($step_drop_status >$current_prices_size * 0.60) {
+                echo "대하락장 시작 존버\n\n";
+                return false;
+            }
+        }
 
         if ($is_high && $renge_high && !$already_low && $is_low_average_value) {
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
@@ -133,8 +151,8 @@ class BuyController
         );
 
         if (round($using_krw, 4) < $min_units[$this->coin_type]) {
-            echo $current_krw / $this->current_price;
-            $using_krw = $current_krw / $this->current_price;
+            echo "총알이 모자르다 존버 \n\n";
+            return false;
         }
 
         $sql = 'select registered_time from buy_result where coin_type = "'.$this->coin_type.'" order by registered_time desc limit 1';
