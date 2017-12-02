@@ -62,7 +62,6 @@ class BuyController
         }
 
         $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
-        $renge_high = $GLOBALS['data_div_count'] - $highLoc > 2;
         $already_low = $this->coin_status->isAlreadyDropStatus();
         $is_low_average_value = ($high + $low) / 2 > $this->current_price * 0.99;
         $started_drop = $this->coin_status->isStartedDropStatus();
@@ -81,8 +80,6 @@ class BuyController
 
         echo "최고가인가?";
         var_dump($is_high);
-        echo "최고가와 시간차가 좀 나야한다";
-        var_dump($renge_high);
         echo "여전히 떨어지고 있는가?";
         var_dump($already_low);
         echo "최고 최저 평균보다 현재값이 낮아야한다";
@@ -105,7 +102,9 @@ class BuyController
             }
         }
 
-        if ($is_high && $renge_high && !$already_low && $is_low_average_value) {
+        if ($is_high && !$already_low && $is_low_average_value
+            && $this->coin_status->isAlreadyUpStatusFromVolume()
+            && !$this->coin_status->isStartedDropStatusFromVolume()) {
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 echo $high. "\n";
                 echo $low. "\n";
@@ -119,6 +118,17 @@ class BuyController
                 echo "폭락22\n\n";
                 return false;
             }
+            return true;
+        } else if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()
+                && $this->coin_status->isAlreadyUpStatusFromVolume()){
+            echo "전체적인 상승장에 조정 기간 예측 \n\n";
+            return true;
+        } else if ($this->coin_status->isStartedUpStatus()
+            && $this->coin_status->isAlreadyUpStatusFromVolume()
+            && $this->coin_status->isStartedUpStatusFromVolume()){
+            echo "떡상이다. 탄다!!!! \n\n";
+            echo "떡상이다. 탄다!!!! \n\n";
+            echo "떡상이다. 탄다!!!! \n\n";
             return true;
         } else {
             return false;
@@ -204,5 +214,9 @@ class BuyController
             var_dump($this->db->query($sql));
         }
 	    echo '구매완료';
+    }
+
+    private function upStatus()
+    {
     }
 }

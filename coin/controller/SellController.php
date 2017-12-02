@@ -43,18 +43,19 @@ class SellController
             );
 
             if ($GLOBALS['cut_stop_motion'] === true) {
-                if ($current_coin_price >= $price * 0.98) {
+                if ($current_coin_price >= $price * 0.99) {
                     $this->stop_motion($param, $buy_result_id);
                 }
             }
 
             if ($current_coin_price > $price * $GLOBALS['sell_fee']) {
-                if ($this->coin_status->isStartedUpStatus()) {
+                if ($this->coin_status->isStartedUpStatus() && $this->coin_status->isStartedUpStatusFromVolume()) {
                     echo '상승장 시작!!!!';
                     continue;
                 }
 
-                if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()) {
+                if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()
+                    && $this->coin_status->isAlreadyUpStatusFromVolume()) {
                     echo '상승중!!!!';
                     continue;
                 }
@@ -70,8 +71,8 @@ class SellController
     private function stop_motion($param, $buy_result_id)
     {
         if ($this->coin_status->isAlreadyDropStatus() &&
-            !$this->coin_status->isStartedUpStatus()) {
-            echo "하락장!! 손절을 시작합니다.\n\n";
+            $this->coin_status->isStartedUpStatus()) {
+            echo "하락장!! 반등 구간!! 손절을 시작합니다.\n\n";
             $this->sell_coin($param, $buy_result_id);
         }
     }
