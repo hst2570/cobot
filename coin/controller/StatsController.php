@@ -22,7 +22,7 @@ class StatsController
         date_default_timezone_set('UTC');
         $date = time();
         $date = date('Y-m-d H:i:s', $date);
-        $message = "<<<Daily Stats Start>>> \n";
+        $message = "## Daily Stats Start ##\n";
 
         $sql = "select
           s.coin_type,
@@ -61,7 +61,8 @@ class StatsController
             $sell_total = $sell_total + $result[6];
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
-        $message = $message. "총 매도액: ". $sell_total. "\n\n\n";
+        $message = $message. "총 매도액: ". $sell_total. "\n\n";
+        $message = $message. "\n";
 
         return $message;
     }
@@ -70,7 +71,7 @@ class StatsController
     {
         $message = $this->daily_stats();
         date_default_timezone_set('UTC');
-        $message = $message. "<<<총 Stats Start>>> \n";
+        $message = $message. "## 총 Stats Start ##\n";
 
         $sql = "select
           s.coin_type,
@@ -109,9 +110,10 @@ class StatsController
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
         $message = $message. "총 매도액: ". $sell_total ."\n";
-        $message = $message. "총 차액: ". $sell_total - $buy_total. "\n\n\n";
+        $message = $message. "총 차액: ". $sell_total - $buy_total. "\n\n";
+        $message = $message. "\n";
 
-        $message = $message. "<<미채결 거래내역 통계>>\n";
+        $message = $message. "## 미채결 거래내역 통계 ##\n";
 
         $sql = "select
           b.coin_type,
