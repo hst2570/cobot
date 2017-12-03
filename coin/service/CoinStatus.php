@@ -25,7 +25,7 @@ class CoinStatus
     private function getTraded()
     {
         date_default_timezone_set('UTC');
-        $date = strtotime('-5 hour');
+        $date = strtotime($GLOBALS['get_data_by_hour'].' hour');
         $date = date('Y-m-d H:i:s', $date);
 
         $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 

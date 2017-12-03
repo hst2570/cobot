@@ -41,7 +41,7 @@ class SellController
             );
 
             if ($GLOBALS['cut_stop_motion'] === true) {
-                if ($current_coin_price >= $price * 0.99) {
+                if ($current_coin_price >= $price ) {
                     $this->stop_motion($param, $buy_result_id);
                 }
             }

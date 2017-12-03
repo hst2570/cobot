@@ -61,9 +61,7 @@ class BuyController
             }
         }
 
-        $is_high = $high > $this->current_price * $GLOBALS['buy_fee'];
         $already_low = $this->coin_status->isAlreadyDropStatus();
-        $is_low_average_value = ($high + $low) / 2 > $this->current_price * 0.99;
         $started_drop = $this->coin_status->isStartedDropStatus();
 
         echo '최고가: '.$high. "\n";
@@ -78,12 +76,8 @@ class BuyController
         echo '최고가 최저가 평균: '.($high + $low) / 2;
         echo "\n\n";
 
-        echo "최고가인가?";
-        var_dump($is_high);
         echo "여전히 떨어지고 있는가?";
         var_dump($already_low);
-        echo "최고 최저 평균보다 현재값이 낮아야한다";
-        var_dump($is_low_average_value);
         echo "하락장 초입인가?";
         var_dump($started_drop);
 
@@ -102,9 +96,9 @@ class BuyController
             }
         }
 
-        if ($is_high && !$already_low && $is_low_average_value
-            && $this->coin_status->isAlreadyUpStatusFromVolume()
-            && !$this->coin_status->isStartedDropStatusFromVolume()) {
+        if ($this->coin_status->isStartedUpStatusFromVolume()
+            && !$this->coin_status->isStartedDropStatusFromVolume()
+            && $started_drop) {
             echo "정상매수 \n\n";
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 echo $high. "\n";
@@ -121,12 +115,13 @@ class BuyController
             }
             return true;
         } else if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()
-                && $this->coin_status->isAlreadyUpStatusFromVolume()){
+                && $this->coin_status->isAlreadyUpStatusFromVolume()
+                && $started_drop){
             echo "전체적인 상승장에 조정 기간 예측 \n\n";
             return true;
         } else if ($this->coin_status->isStartedUpStatus()
-            && $this->coin_status->isAlreadyUpStatusFromVolume()
-            && $this->coin_status->isStartedUpStatusFromVolume()){
+            && $this->coin_status->isStartedUpStatusFromVolume()
+            && !$started_drop){
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";

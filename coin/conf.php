@@ -12,3 +12,4 @@ $is_drop_status_volume_value = 0.70;
 $is_up_status_volume_value = 0.70;
 $is_stated_up = 0.80;
 $is_stated_drop = 0.80;
+$get_data_by_hour = 5;
