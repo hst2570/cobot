@@ -95,14 +95,16 @@ class BuyController
                 }
             }
             if ($step_drop_status >$current_prices_size * 0.60) {
-                echo "대하락장 시작 존버\n\n";
-                return false;
+                $message = '';
+                $message = $message. '### 코인타입: '.$this->coin_type. " ###\n";
+                $message = $message. "----- 대하락장 예상 ----- ";
+                $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
             }
         }
 
-        if ($this->coin_status->isStartedUpStatusFromVolume()
-            && !$this->coin_status->isStartedDropStatusFromVolume()
-            && $started_drop) {
+        if ($high > $this->current_price * $GLOBALS['buy_fee'] &&
+            $this->coin_status->isStartedUpStatusFromVolume()
+            && !$started_drop) {
             echo "정상매수 \n\n";
             $this->buy_complete_status_message = "정상매수";
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
@@ -119,17 +121,16 @@ class BuyController
                 return false;
             }
             return true;
-        } else if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()
-                && $this->coin_status->isAlreadyUpStatusFromVolume()
-                && $started_drop){
+        } else if ($this->coin_status->isAlreadyUpStatus()
+            && $this->coin_status->isStartedDropStatus()
+            && $this->coin_status->isAlreadyUpStatusFromVolume()
+            && !$started_drop) {
             echo "전체적인 상승장에 조정 기간 예측 \n\n";
             $this->buy_complete_status_message  = "전체적인 상승장에 조정 기간 예측";
             return true;
         } else if ($this->coin_status->isStartedUpStatus()
             && $this->coin_status->isStartedUpStatusFromVolume()
-            && !$started_drop){
-            echo "떡상이다. 탄다!!!! \n\n";
-            echo "떡상이다. 탄다!!!! \n\n";
+            && !$started_drop) {
             echo "떡상이다. 탄다!!!! \n\n";
             $this->buy_complete_status_message  = "떡상이다. 탄다!!!!";
             return true;
