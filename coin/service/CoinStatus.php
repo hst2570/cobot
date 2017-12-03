@@ -35,30 +35,6 @@ class CoinStatus
         return $this->db->query($sql)->fetch_all();
     }
 
-    private function getMaximumPrice()
-    {
-        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
-         order by price desc limit 1';
-
-        return $this->db->query($sql)->fetch_all();
-    }
-
-    private function getMinimumPrice()
-    {
-        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
-         order by price asc limit 1';
-
-        return $this->db->query($sql)->fetch_all();
-    }
-
-    private function getAll()
-    {
-        $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
-         order by transaction_date asc';
-
-        return $this->db->query($sql)->fetch_all();
-    }
-
     public function getAverageData()
     {
         $average = array();
@@ -150,7 +126,7 @@ class CoinStatus
             }
         }
 
-        if ($volume_low * $GLOBALS['is_drop_status_volume_value']) {
+        if (sizeof($volume) * $GLOBALS['is_drop_status_volume_value'] < $volume_low) {
             echo "볼륨 하락장!!! \n";
             return true;
         }
@@ -180,7 +156,7 @@ class CoinStatus
                 && ($average[sizeof($average)-2] * 0.995 > $this->current_price &&
                     $average[sizeof($average)-1] * 1.005 > $this->current_price));
 
-        if ($step_drop_status >$current_prices_size * 0.85 && $already_step_drop_status) {
+        if ($step_drop_status > $current_prices_size * 0.85 && $already_step_drop_status) {
             echo "하락장 초입 예상\n\n";
             return true;
         }
@@ -199,7 +175,7 @@ class CoinStatus
             }
         }
 
-        if ($volume_low * $GLOBALS['is_drop_status_volume_value']) {
+        if ($current_prices_size  * $GLOBALS['is_drop_status_volume_value'] < $volume_low) {
             echo "최근 볼륨 하락 시작!!! \n";
             return true;
         }
@@ -238,7 +214,7 @@ class CoinStatus
             }
         }
 
-        if ($volume_low * $GLOBALS['is_up_status_volume_value']) {
+        if (sizeof($volume) * $GLOBALS['is_up_status_volume_value'] < $volume_low) {
             echo "볼륨 상승장!!! \n";
             return true;
         }
@@ -259,7 +235,7 @@ class CoinStatus
             }
         }
 
-        if ($step_drop_status >$current_prices_size * 0.90) {
+        if ($step_drop_status > $current_prices_size * 0.90) {
             echo "상승장 초입 예상\n\n";
             return true;
         }
@@ -278,7 +254,7 @@ class CoinStatus
             }
         }
 
-        if ($volume_low * $GLOBALS['is_up_status_volume_value']) {
+        if ($current_prices_size * $GLOBALS['is_up_status_volume_value'] < $volume_low ) {
             echo "최근 볼륨 상승 시작!!! \n";
             return true;
         }
