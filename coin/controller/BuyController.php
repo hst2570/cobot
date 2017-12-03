@@ -1,6 +1,7 @@
 <?php
 
 require_once MAX_PATH . '/handle/xcoin_api_client.php';
+require_once MAX_PATH . '/handle/Telegram.php';
 require_once MAX_PATH . '/service/CoinStatus.php';
 
 class BuyController
@@ -12,6 +13,8 @@ class BuyController
     private $trade_path = '/trade/market_buy';
     private $current_price = 0;
     private $coin_status;
+    private $monitoring_telegram;
+    private $buy_complete_status_message;
     private $field = array(
         'traded_info_id',
         'transaction_date',
@@ -30,6 +33,7 @@ class BuyController
         $this->api = new XCoinAPI();
         $this->coin_status = new CoinStatus($coin_type);
         $this->current_price = $this->coin_status->currentPrice();
+        $this->monitoring_telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['_TELEGRAM_CHAT_ID']);
     }
 
     public function getBuy()
@@ -100,6 +104,7 @@ class BuyController
             && !$this->coin_status->isStartedDropStatusFromVolume()
             && $started_drop) {
             echo "정상매수 \n\n";
+            $this->buy_complite_status_message = "정상매수";
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 echo $high. "\n";
                 echo $low. "\n";
@@ -118,6 +123,7 @@ class BuyController
                 && $this->coin_status->isAlreadyUpStatusFromVolume()
                 && $started_drop){
             echo "전체적인 상승장에 조정 기간 예측 \n\n";
+            $this->buy_complite_status_message = "전체적인 상승장에 조정 기간 예측";
             return true;
         } else if ($this->coin_status->isStartedUpStatus()
             && $this->coin_status->isStartedUpStatusFromVolume()
@@ -125,6 +131,7 @@ class BuyController
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";
+            $this->buy_complite_status_message = "떡상이다. 탄다!!!!";
             return true;
         } else {
             return false;
@@ -209,11 +216,19 @@ class BuyController
                 VALUES (' . implode($value, ',') . ')';
 
             var_dump($this->db->query($sql));
+            $message = "
+                타입 : 구매\n
+                상태 : ".$this->buy_complete_status_message."\n
+                구매코인 : ".$this->coin_type."\n
+                금액 : ".$info->price."\n
+                갯수 : ".$info->units."\n
+                총합 : ".$info->total."\n
+                수수료 : ".$info->fee."\n
+                예상판매금액 : ".$info->price * $GLOBALS['sell_fee']."\n
+            ";
+            $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
         }
-	    echo '구매완료';
-    }
 
-    private function upStatus()
-    {
+	    echo '구매완료';
     }
 }

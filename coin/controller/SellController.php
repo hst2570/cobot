@@ -1,6 +1,7 @@
 <?php
 
 require_once MAX_PATH . '/handle/xcoin_api_client.php';
+require_once MAX_PATH . '/handle/Telegram.php';
 require_once MAX_PATH . '/service/CoinStatus.php';
 
 class SellController
@@ -11,6 +12,8 @@ class SellController
     private $current_price_path = '/public/ticker/';
     private $sell_path = '/trade/market_sell';
     private $coin_status;
+    private $monitoring_telegram;
+    private $sell_complete_status_message;
 
     public function __construct($coin_type)
     {
@@ -18,6 +21,7 @@ class SellController
         $this->coin_type = $coin_type;
         $this->api = new XCoinAPI();
         $this->coin_status = new CoinStatus($coin_type);
+        $this->monitoring_telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['_TELEGRAM_CHAT_ID']);
     }
 
     public function sell()
@@ -46,6 +50,7 @@ class SellController
 
             if ($units < $min_units[$this->coin_type]) {
                 echo "판매 코인수가 적다.\n\n";
+                $this->change_status_low_unit($buy_result_id, 2);
                 continue;
             }
 
@@ -107,8 +112,27 @@ class SellController
                             VALUES (' . implode($value, ',') . ')';
             $this->db->query($sql);
 
-            $sql = 'update buy_result set transaction = 1 where buy_result_id = ' . $buy_result_id;
-            $this->db->query($sql);
+            $this->change_status_low_unit($buy_result_id, 1);
+
+            $message = "
+                타입 : 판매\n
+                상태 : ".$this->sell_complete_status_message."\n
+                구매ID : ".$buy_result_id."\n
+                판매코인 : ".$this->coin_type."\n
+                금액 : ".$info->price."\n
+                갯수 : ".$info->units."\n
+                총합 : ".$info->total."\n
+                수수료 : ".$info->fee."\n
+            ";
+
+            $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
         }
+    }
+
+    private function change_status_low_unit($buy_result_id, $transaction)
+    {
+        $sql = 'update buy_result set transaction = '.$transaction.' where buy_result_id = ' . $buy_result_id;
+
+        $this->db->query($sql);
     }
 }
