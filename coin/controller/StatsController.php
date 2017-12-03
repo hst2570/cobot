@@ -57,8 +57,8 @@ class StatsController
             $message = $message. "* 총 판매액: ". $result[8] ."\n";
             $message = $message. "---------------------------------\n\n";
 
-            $buy_total = $buy_total + $result[5];
-            $sell_total = $sell_total + $result[6];
+            $buy_total = $buy_total + $result[7];
+            $sell_total = $sell_total + $result[8];
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
         $message = $message. "총 매도액: ". $sell_total;
@@ -68,7 +68,40 @@ class StatsController
     public function total_stats()
     {
         $this->daily_stats();
-        date_default_timezone_set('UTC');
+        $this->all_stats();
+
+        $message = "## 미채결 거래내역 통계 ##\n";
+
+        $sql = "select
+          b.coin_type,
+          avg(b.price) as buy_price,
+          sum(b.units) as buy_units,
+          sum(b.fee) as buy_fee,
+          sum(b.total) as buy_total
+           from buy_result as b
+           where b.transaction = 0
+          group by coin_type";
+
+        $wait_buy = $this->db->query($sql)->fetch_all();
+        $buy_total = 0;
+        foreach ($wait_buy as $result) {
+            $message = $message. "* 코인 타입: <". $result[0] .">\n";
+            $message = $message. "* 평균 구매액: ". $result[1] ."\n";
+            $message = $message. "* 총 구매갯수: ". $result[2] ."\n";
+            $message = $message. "* 총 구매수수료: ". $result[3] ."\n";
+            $message = $message. "* 총 구매액: ". $result[4] ."\n";
+            $message = $message. "---------------------------------\n\n";
+
+            $buy_total = $buy_total + $result[4];
+        }
+
+        $message = $message. "총 미채결액: ". $buy_total;
+
+        $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
+    }
+
+    private function all_stats()
+    {
         $message = "## 총 Stats Start ##\n";
 
         $sql = "select
@@ -103,41 +136,12 @@ class StatsController
             $message = $message. "* 총 판매액: ". $result[8] ."\n";
             $message = $message. "---------------------------------\n\n";
 
-            $buy_total = $buy_total + $result[5];
-            $sell_total = $sell_total + $result[6];
+            $buy_total = $buy_total + $result[7];
+            $sell_total = $sell_total + $result[8];
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
         $message = $message. "총 매도액: ". $sell_total ."\n";
         $message = $message. "총 차액: ". $sell_total - $buy_total;
-
-        $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
-
-        $message = "## 미채결 거래내역 통계 ##\n";
-
-        $sql = "select
-          b.coin_type,
-          avg(b.price) as buy_price,
-          sum(b.units) as buy_units,
-          sum(b.fee) as buy_fee,
-          sum(b.total) as buy_total
-           from buy_result as b
-           where b.transaction = 0
-          group by coin_type";
-
-        $wait_buy = $this->db->query($sql)->fetch_all();
-
-        foreach ($wait_buy as $result) {
-            $message = $message. "* 코인 타입: <". $result[0] .">\n";
-            $message = $message. "* 평균 구매액: ". $result[1] ."\n";
-            $message = $message. "* 총 구매갯수: ". $result[2] ."\n";
-            $message = $message. "* 총 구매수수료: ". $result[3] ."\n";
-            $message = $message. "* 총 구매액: ". $result[4] ."\n";
-            $message = $message. "---------------------------------\n\n";
-
-            $buy_total = $buy_total + $result[4];
-        }
-
-        $message = $message. "총 미채결액: ". $buy_total;
 
         $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
     }
