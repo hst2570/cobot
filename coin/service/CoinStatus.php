@@ -280,8 +280,8 @@ class CoinStatus
             }
         }
 
-        $step_up_status = ($volume[count($volume)-2] * 1.005 < $volume[count($volume)-1] &&
-            $volume[count($volume)-1] * 1.005 < $volume[count($volume)]);
+        $step_up_status = ($volume[sizeof($volume)-3] * 1.005 < $volume[sizeof($volume)-2] &&
+            $volume[sizeof($volume)-2] * 1.005 < $volume[sizeof($volume)-1]);
 
         if ($volume_low * $GLOBALS['is_up_status_volume_value'] && $step_up_status) {
             echo "최근 볼륨 상승 시작!!! \n";
