@@ -165,7 +165,10 @@ class BuyController
         );
 
         if (round($using_krw, 4) < $min_units[$this->coin_type]) {
-            echo "총알이 모자르다 존버 \n\n";
+            $message = '';
+            $message = $message. '### 코인타입: '.$this->coin_type. " ###\n";
+            $message = $message. "----- 총알이 모자르다. 아쉽다. ----- ";
+            $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
             return false;
         }
 
