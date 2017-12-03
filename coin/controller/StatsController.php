@@ -61,17 +61,15 @@ class StatsController
             $sell_total = $sell_total + $result[6];
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
-        $message = $message. "총 매도액: ". $sell_total. "\n\n";
-        $message = $message. "\n";
-
-        return $message;
+        $message = $message. "총 매도액: ". $sell_total;
+        $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
     }
 
     public function total_stats()
     {
-        $message = $this->daily_stats();
+        $this->daily_stats();
         date_default_timezone_set('UTC');
-        $message = $message. "## 총 Stats Start ##\n";
+        $message = "## 총 Stats Start ##\n";
 
         $sql = "select
           s.coin_type,
@@ -110,10 +108,11 @@ class StatsController
         }
         $message = $message. "총 매수액: ". $buy_total ."\n";
         $message = $message. "총 매도액: ". $sell_total ."\n";
-        $message = $message. "총 차액: ". $sell_total - $buy_total. "\n\n";
-        $message = $message. "\n";
+        $message = $message. "총 차액: ". $sell_total - $buy_total;
 
-        $message = $message. "## 미채결 거래내역 통계 ##\n";
+        $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
+
+        $message = "## 미채결 거래내역 통계 ##\n";
 
         $sql = "select
           b.coin_type,
