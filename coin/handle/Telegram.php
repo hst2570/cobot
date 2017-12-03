@@ -78,4 +78,9 @@ class Telegram
 
         return $this->telegramExecCurlRequest($handle);
     }
+
+    public function setGroupId($group_id)
+    {
+        $this->_TELEGRAM_CHAT_ID =  $group_id;
+    }
 }

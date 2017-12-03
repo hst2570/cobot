@@ -171,16 +171,16 @@ class CoinStatus
             }
         }
 
-        $already_step_drop_status = (($average[count($average)-2] * 1.005 > $this->current_price &&
-                    $average[count($average)-1] * 1.005 > $this->current_price)
-                && ($average[count($average)-2] * 0.995 < $this->current_price &&
-                    $average[count($average)-1] * 0.995 < $this->current_price))
-            || (($average[count($average)-2] * 1.005 > $this->current_price &&
-                    $average[count($average)-1] * 0.995 > $this->current_price)
-                && ($average[count($average)-2] * 0.995 > $this->current_price &&
-                    $average[count($average)-1] * 1.005 > $this->current_price));
+        $already_step_drop_status = (($average[sizeof($average)-2] * 1.005 > $this->current_price &&
+                    $average[sizeof($average)-1] * 1.005 > $this->current_price)
+                && ($average[sizeof($average)-2] * 0.995 < $this->current_price &&
+                    $average[sizeof($average)-1] * 0.995 < $this->current_price))
+            || (($average[sizeof($average)-2] * 1.005 > $this->current_price &&
+                    $average[sizeof($average)-1] * 0.995 > $this->current_price)
+                && ($average[sizeof($average)-2] * 0.995 > $this->current_price &&
+                    $average[sizeof($average)-1] * 1.005 > $this->current_price));
 
-        if ($step_drop_status >$current_prices_size * 0.80 && $already_step_drop_status) {
+        if ($step_drop_status >$current_prices_size * 0.85 && $already_step_drop_status) {
             echo "하락장 초입 예상\n\n";
             return true;
         }
@@ -199,9 +199,7 @@ class CoinStatus
             }
         }
 
-        $step_drop_status = ($volume[count($volume)-2] * 1.005 > $volume[count($volume)-1] &&
-            $volume[count($volume)-1] * 1.005 > $volume[count($volume)]);
-        if ($volume_low * $GLOBALS['is_drop_status_volume_value'] && $step_drop_status) {
+        if ($volume_low * $GLOBALS['is_drop_status_volume_value']) {
             echo "최근 볼륨 하락 시작!!! \n";
             return true;
         }
@@ -261,7 +259,7 @@ class CoinStatus
             }
         }
 
-        if ($step_drop_status >$current_prices_size * 0.80) {
+        if ($step_drop_status >$current_prices_size * 0.90) {
             echo "상승장 초입 예상\n\n";
             return true;
         }
@@ -280,10 +278,7 @@ class CoinStatus
             }
         }
 
-        $step_up_status = ($volume[sizeof($volume)-3] * 1.005 < $volume[sizeof($volume)-2] &&
-            $volume[sizeof($volume)-2] * 1.005 < $volume[sizeof($volume)-1]);
-
-        if ($volume_low * $GLOBALS['is_up_status_volume_value'] && $step_up_status) {
+        if ($volume_low * $GLOBALS['is_up_status_volume_value']) {
             echo "최근 볼륨 상승 시작!!! \n";
             return true;
         }

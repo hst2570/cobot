@@ -25,6 +25,7 @@ class CoinInfoController
 
     public function check_coin_status()
     {
+        $this->monitoring_telegram->setGroupId($GLOBALS['TELEGRAM_GROUP_ID']);
         $average = $this->coin_status->getAverageData();
 
         $low = 99999999999;
