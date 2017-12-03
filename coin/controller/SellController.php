@@ -35,6 +35,19 @@ class SellController
             $units = round($data[1] - $data[4], 4);
             $buy_result_id = $data[0];
 
+            $min_units = array(
+                'BTC' => 0.001,
+                'XRP' => 10,
+                'ETH' => 0.01,
+                'ETC' => 0.1,
+                'LTC' => 0.1,
+            );
+
+            if ($units < $min_units[$this->coin_type]) {
+                echo "판매 코인수가 적다.\n\n";
+                continue;
+            }
+
             $param = array(
                 'units' => $units,
                 'currency' => $this->coin_type

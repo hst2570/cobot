@@ -151,7 +151,7 @@ class BuyController
         $min_units = array(
             'BTC' => 0.001,
             'XRP' => 10,
-            'ETH' => 0.1,
+            'ETH' => 0.01,
             'ETC' => 0.1,
             'LTC' => 0.1,
         );
