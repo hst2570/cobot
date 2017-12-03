@@ -77,9 +77,9 @@ class CoinInfoController
             $message = $message. "----- 최근 구매 볼륨이 더 작은 상태----- \n";
         }
 
-        if ($this->coin_status->isStartedUpStatusFromVolume()
-            && !$this->coin_status->isStartedDropStatusFromVolume()
-            && $started_drop) {
+        if ($high > $this->current_price * $GLOBALS['buy_fee'] &&
+            $this->coin_status->isStartedUpStatusFromVolume()
+            && !$started_drop) {
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 $message = $message. "----- 폭락장... 존버 또는 손절 요망!!!----- ";
                 $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
@@ -93,7 +93,7 @@ class CoinInfoController
             $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
         } else if ($this->coin_status->isAlreadyUpStatus() && $this->coin_status->isStartedDropStatus()
             && $this->coin_status->isAlreadyUpStatusFromVolume()
-            && $started_drop) {
+            && !$started_drop) {
             $message = $message. "+++++ 전체적인 상승장에 조정 기간으로 예측된다. 매수? +++++";
             $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
         } else if ($this->coin_status->isStartedUpStatus()
