@@ -104,7 +104,7 @@ class BuyController
             && !$this->coin_status->isStartedDropStatusFromVolume()
             && $started_drop) {
             echo "정상매수 \n\n";
-            $this->buy_complite_status_message = "정상매수";
+            $this->buy_complete_status_message = "정상매수";
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 echo $high. "\n";
                 echo $low. "\n";
@@ -123,7 +123,7 @@ class BuyController
                 && $this->coin_status->isAlreadyUpStatusFromVolume()
                 && $started_drop){
             echo "전체적인 상승장에 조정 기간 예측 \n\n";
-            $this->buy_complite_status_message = "전체적인 상승장에 조정 기간 예측";
+            $this->buy_complete_status_message  = "전체적인 상승장에 조정 기간 예측";
             return true;
         } else if ($this->coin_status->isStartedUpStatus()
             && $this->coin_status->isStartedUpStatusFromVolume()
@@ -131,7 +131,7 @@ class BuyController
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";
             echo "떡상이다. 탄다!!!! \n\n";
-            $this->buy_complite_status_message = "떡상이다. 탄다!!!!";
+            $this->buy_complete_status_message  = "떡상이다. 탄다!!!!";
             return true;
         } else {
             return false;

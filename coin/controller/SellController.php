@@ -76,8 +76,7 @@ class SellController
                     echo '상승중!!!!';
                     continue;
                 }
-
-
+                $this->sell_complete_status_message = "정상 판매";
                 $this->sell_coin($param, $buy_result_id);
                 echo $data[0]. " 판매완료\n";
             }
@@ -89,6 +88,7 @@ class SellController
         if ($this->coin_status->isAlreadyDropStatus() &&
             $this->coin_status->isStartedUpStatus()) {
             echo "하락장!! 반등 구간!! 손절을 시작합니다.\n\n";
+            $this->sell_complete_status_message = "하락장!! 반등 구간!! 손절을 시작합니다.";
             $this->sell_coin($param, $buy_result_id);
         }
     }
