@@ -154,6 +154,7 @@ class BuyController
             'ETH' => 0.01,
             'ETC' => 0.1,
             'LTC' => 0.1,
+            'DASH' => 0.01,
         );
 
         if (round($using_krw, 4) < $min_units[$this->coin_type]) {

@@ -41,6 +41,7 @@ class SellController
                 'ETH' => 0.01,
                 'ETC' => 0.1,
                 'LTC' => 0.1,
+                'DASH' => 0.01,
             );
 
             if ($units < $min_units[$this->coin_type]) {
