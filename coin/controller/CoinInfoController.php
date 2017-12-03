@@ -70,13 +70,11 @@ class CoinInfoController
         }
 
         if ($this->coin_status->isStartedUpStatusFromVolume()) {
-            $message = $message. "+++++ 최근 구매 볼륨이 더 큰 상태 +++++";
-            $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
+            $message = $message. "+++++ 최근 구매 볼륨이 더 큰 상태 +++++ \n";
         }
 
         if ($this->coin_status->isStartedDropStatusFromVolume()) {
-            $message = $message. "----- 최근 구매 볼륨이 더 작은 상태----- ";
-            $this->monitoring_telegram->telegramApiRequest("sendMessage", $message);
+            $message = $message. "----- 최근 구매 볼륨이 더 작은 상태----- \n";
         }
 
         if ($this->coin_status->isStartedUpStatusFromVolume()
