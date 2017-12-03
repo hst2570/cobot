@@ -25,13 +25,12 @@ class CoinStatus
     private function getTraded()
     {
         date_default_timezone_set('UTC');
-        $date = strtotime('-4 hour');
+        $date = strtotime('-5 hour');
         $date = date('Y-m-d H:i:s', $date);
 
         $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
          and registered_time > "'. $date .'"
          order by transaction_date asc';
-        echo $sql;
 
         return $this->db->query($sql)->fetch_all();
     }
@@ -40,7 +39,6 @@ class CoinStatus
     {
         $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
          order by price desc limit 1';
-        echo $sql;
 
         return $this->db->query($sql)->fetch_all();
     }
@@ -49,7 +47,6 @@ class CoinStatus
     {
         $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
          order by price asc limit 1';
-        echo $sql;
 
         return $this->db->query($sql)->fetch_all();
     }
@@ -58,7 +55,6 @@ class CoinStatus
     {
         $sql = 'select * from traded_info where coin_type = "'.$this->coin_type.'" 
          order by transaction_date asc';
-        echo $sql;
 
         return $this->db->query($sql)->fetch_all();
     }
@@ -205,7 +201,6 @@ class CoinStatus
 
         $step_drop_status = ($volume[count($volume)-2] * 1.005 > $volume[count($volume)-1] &&
             $volume[count($volume)-1] * 1.005 > $volume[count($volume)]);
-
         if ($volume_low * $GLOBALS['is_drop_status_volume_value'] && $step_drop_status) {
             echo "최근 볼륨 하락 시작!!! \n";
             return true;

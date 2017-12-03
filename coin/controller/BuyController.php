@@ -105,6 +105,7 @@ class BuyController
         if ($is_high && !$already_low && $is_low_average_value
             && $this->coin_status->isAlreadyUpStatusFromVolume()
             && !$this->coin_status->isStartedDropStatusFromVolume()) {
+            echo "정상매수 \n\n";
             if ($high > $low * $GLOBALS['is_very_drop_per']) {
                 echo $high. "\n";
                 echo $low. "\n";
@@ -144,7 +145,7 @@ class BuyController
 
         $using_krw = $current_krw / $GLOBALS['budget_div'];
 
-        if ($current_krw < 15000 ) {
+        if ($using_krw < 15000 ) {
             $using_krw = $current_krw;
         }
 

@@ -7,7 +7,7 @@ class GetTradeController
     private $recent_transactions = '/public/recent_transactions';
     private $api;
     private $coin_type;
-    private $offset = 101;
+    private $offset = 51;
     private $offsetLength = 5;
     private $db;
 
@@ -53,6 +53,7 @@ class GetTradeController
             );
             $result[] = $this->api->xcoinApiCall($this->recent_transactions.'/'.$this->coin_type, $rgParams, 'GET');
             echo $i . '번째 호출 완료' .date('Y-M-D h:i:s')."\n";
+            sleep(0.2);
         }
 
         return $result;

@@ -30,8 +30,6 @@ class SellController
         $current_coin_info = $current_coin_call->data;
         $current_coin_price = $current_coin_info->sell_price;
 
-        var_dump($no_sell_data);
-
         foreach ($no_sell_data as $data) {
             $price = $data[2];
             $units = round($data[1] - $data[4], 4);
@@ -60,7 +58,6 @@ class SellController
                     continue;
                 }
 
-                var_dump($param);
 
                 $this->sell_coin($param, $buy_result_id);
                 echo $data[0]. " 판매완료\n";
