@@ -2,12 +2,13 @@
 
 define('MAX_PATH',dirname(__FILE__));
 require_once MAX_PATH . '/handle/Telegram.php';
-
+require_once MAX_PATH . '/env.php';
+require_once MAX_PATH . '/conf.php';
 
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
 $sql = 'select * from upbit order by row_number desc limit 1';
-$len = $this->db->query($sql);
-$len = $len[0];
+$len = $db->query($sql)->fetch_all();
+$len = $len[0][0];
 
 for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $url = 'https://api-manager.upbit.com/api/v1/notices/' . $i;
@@ -24,12 +25,14 @@ for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
         $message = "##업비트 새로운 공지##\n";
         $message = $message.$result->data->title."\n";
         $message = $message.$result->data->body."\n";
+        /* 그룹 */
         $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+        $telegram->telegramApiRequest("sendMessage", $message);
         $sql = 'insert into upbit (row_number) VALUES ('.$i.')';
-        $this->db->query($sql);
+        $db->query($sql);
+
+        /* 채널 */
+        $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+        $telegram->telegramApiRequest("sendMessage", $message);
     }
 }
-
-
-
-
