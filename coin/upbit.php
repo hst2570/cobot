@@ -4,6 +4,7 @@ define('MAX_PATH',dirname(__FILE__));
 require_once MAX_PATH . '/handle/Telegram.php';
 require_once MAX_PATH . '/env.php';
 require_once MAX_PATH . '/conf.php';
+require_once MAX_PATH . '/handle/UrlJsonParser.php';
 
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
 $sql = 'select * from upbit order by row_number desc limit 1';
@@ -34,5 +35,25 @@ for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
         /* 채널 */
         $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
+    }
+}
+
+$in = UrlJsonParser::getInstance();
+$curl = $in->getCurl('support.binance.com/hc/en-us/sections/115000106672-New-Listings');
+
+$result = preg_split('/\n/',$curl);
+$rex = '/.*class="article-list-link">(.*)<\/a>/';
+$list = array();
+
+foreach ($result as $line) {
+    if (preg_match($rex, $line)) {
+        $list = preg_replace('/.*class="article-list-link">(.*)<\/a>/', '$1', $line);
+        $sql = 'select * from binance where contents="'.$list.'"';
+        $isset = $db->query($sql)->fetch_all();
+        if (empty($isset)) {
+            $sql = 'insert into binance (contents) VALUES ('.$list.')';
+            $db->query($sql);
+            echo $sql;
+        }
     }
 }
