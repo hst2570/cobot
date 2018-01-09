@@ -10,6 +10,9 @@ $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS[
 $sql = 'select * from upbit order by row_number desc limit 1';
 $len = $db->query($sql)->fetch_all();
 $len = $len[0][0];
+date_default_timezone_set('UTC');
+$date = strtotime('now');
+$date = date('Y-m-d H:i:s', $date);
 
 for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $url = 'https://api-manager.upbit.com/api/v1/notices/' . $i;
@@ -50,10 +53,20 @@ foreach ($result as $line) {
         $list = preg_replace('/.*class="article-list-link">(.*)<\/a>/', '$1', $line);
         $sql = 'select * from binance where contents="'.$list.'"';
         $isset = $db->query($sql)->fetch_all();
+
         if (empty($isset)) {
             $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
             $db->query($sql);
-            echo $sql;
+
+            $message = "### 바이넨스 new lists ###\n\n
+                $list\n\n
+                $date";
+
+            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
+
+            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
         }
     }
 }
