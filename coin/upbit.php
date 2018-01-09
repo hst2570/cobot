@@ -58,9 +58,7 @@ foreach ($result as $line) {
             $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
             $db->query($sql);
 
-            $message = "### 바이넨스 new lists ###\n\n
-                $list\n\n
-                $date";
+            $message = "### 바이넨스 new lists ###\n\n$list\n\n$date";
 
             $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
             $telegram->telegramApiRequest("sendMessage", $message);
