@@ -51,7 +51,7 @@ foreach ($result as $line) {
         $sql = 'select * from binance where contents="'.$list.'"';
         $isset = $db->query($sql)->fetch_all();
         if (empty($isset)) {
-            $sql = 'insert into binance (contents) VALUES ('.$list.')';
+            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
             $db->query($sql);
             echo $sql;
         }
