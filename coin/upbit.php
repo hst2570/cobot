@@ -78,20 +78,20 @@ $list = array();
 foreach ($result as $line) {
     if (preg_match($rex, $line)) {
         $list = preg_replace($rex, '$1', $line);
-        $sql = 'select * from binance where contents="'.$list.'"';
+        $sql = 'select * from kucoin where contents="'.$list.'"';
         $isset = $db->query($sql)->fetch_all();
 
         if (empty($isset)) {
-            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
+            $sql = 'insert into kucoin (contents) VALUES ("'.$list.'")';
             $db->query($sql);
 
             $message = "### KuCoin new Announcement ###\n\n$list\n\n$date";
 
-//            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-//            $telegram->telegramApiRequest("sendMessage", $message);
-//
-//            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
-//            $telegram->telegramApiRequest("sendMessage", $message);
+            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
+
+            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
         }
     }
 }
