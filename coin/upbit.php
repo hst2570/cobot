@@ -68,3 +68,30 @@ foreach ($result as $line) {
         }
     }
 }
+
+$curl = $in->getCurl('https://news.kucoin.com/en/category/announcements/');
+
+$result = preg_split('/\n/',$curl);
+$rex = '/.*[^>]+.*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/';
+$list = array();
+
+foreach ($result as $line) {
+    if (preg_match($rex, $line)) {
+        $list = preg_replace($rex, '$1', $line);
+        $sql = 'select * from binance where contents="'.$list.'"';
+        $isset = $db->query($sql)->fetch_all();
+
+        if (empty($isset)) {
+            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
+            $db->query($sql);
+
+            $message = "### KuCoin new Announcement ###\n\n$list\n\n$date";
+
+//            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+//            $telegram->telegramApiRequest("sendMessage", $message);
+//
+//            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+//            $telegram->telegramApiRequest("sendMessage", $message);
+        }
+    }
+}

@@ -12,6 +12,21 @@
   "require": {
     "irazasyed/telegram-bot-sdk": "^2.0",
     "longman/telegram-bot": "*",
-    "unreal4u/telegram-api": "~3.0"
+    "unreal4u/telegram-api": "~3.0",
+	"phpunit/phpunit": "*",
+	"facebook/webdriver": "*"
+  },
+  "require-dev": {
+    "fzaninotto/faker": "~1.4",
+    "mockery/mockery": "0.9.*",
+    "phpunit/phpunit": "~5.0",
+    "phpspec/phpspec": "~2.1",
+    "laracasts/generators": "~1.1",
+    "potsky/laravel-localization-helpers" : "~1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "YourTest": "coin/tests/"
+    }
   }
 }
