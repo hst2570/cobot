@@ -33,30 +33,3 @@ class UrlJsonParser
         return curl_exec($handle);
     }
 }
-
-$a = UrlJsonParser::getInstance();
-$curl = $a->getCurl('http://bithumb.cafe/notice');
-
-$result = preg_split('/\n/',$curl);
-$rex = '/.*href="http:\/\/bithumb.cafe\/archives.*>(.*)<\/a>$/';
-$list = array();
-
-foreach ($result as $line) {
-    if (preg_match($rex, $line)) {
-        $list = preg_replace($rex, '$1', $line);
-        if ($list !== '' && $list !== "더 보기") {
-            $no = preg_replace('/.*href="http:\/\/bithumb.cafe\/archives\/(.*)".*>(.*)<\/a>$/', '$1', $line);
-            var_dump($no);
-        }
-//        $sql = 'select * from binance where contents="'.$list.'"';
-//        $isset = $db->query($sql)->fetch_all();
-
-//        if (empty($isset)) {
-//            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
-//            $db->query($sql);
-//
-//            $message = "### 바이넨스 new lists ###\n\n$list\n\n$date";
-//
-//        }
-    }
-}
