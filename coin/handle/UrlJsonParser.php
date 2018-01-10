@@ -35,18 +35,21 @@ class UrlJsonParser
 }
 
 $a = UrlJsonParser::getInstance();
-$curl = $a->getCurl('https://news.kucoin.com/en/category/announcements/');
+$curl = $a->getCurl('http://bithumb.cafe/notice');
 
 $result = preg_split('/\n/',$curl);
-$rex = '/.*[^>]+.*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/';
+$rex = '/.*href="http:\/\/bithumb.cafe\/archives.*>(.*)<\/a>$/';
 $list = array();
 
 foreach ($result as $line) {
     if (preg_match($rex, $line)) {
         $list = preg_replace($rex, '$1', $line);
+        if ($list !== '' && $list !== "더 보기") {
+            var_dump($list);
+        }
 //        $sql = 'select * from binance where contents="'.$list.'"';
 //        $isset = $db->query($sql)->fetch_all();
-var_dump($list);
+
 //        if (empty($isset)) {
 //            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
 //            $db->query($sql);

@@ -95,3 +95,32 @@ foreach ($result as $line) {
         }
     }
 }
+
+$curl = $in->getCurl('http://bithumb.cafe/notice');
+
+$result = preg_split('/\n/',$curl);
+$rex = '/.*href="http:\/\/bithumb.cafe\/archives.*>(.*)<\/a>$/';
+$list = array();
+
+foreach ($result as $line) {
+    if (preg_match($rex, $line)) {
+        $list = preg_replace($rex, '$1', $line);
+        if ($list !== '' && $list !== "더 보기") {
+            $sql = 'select * from bithumb where contents="'.$list.'"';
+            $isset = $db->query($sql)->fetch_all();
+
+            if (empty($isset)) {
+                $sql = 'insert into bithumb (contents) VALUES ("'.$list.'")';
+                $db->query($sql);
+
+                $message = "### bithumb new Announcement ###\n\n$list\n\n$date";
+
+//                $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+//                $telegram->telegramApiRequest("sendMessage", $message);
+//
+//                $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+//                $telegram->telegramApiRequest("sendMessage", $message);
+            }
+        }
+    }
+}
