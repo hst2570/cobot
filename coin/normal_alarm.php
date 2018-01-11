@@ -14,9 +14,7 @@ date_default_timezone_set('UTC');
 $date = strtotime('now');
 $date = date('Y-m-d H:i:s', $date);
 
-$support_wallet = "\n\n## 여러분의 후원으로 더 좋은 알람 서비스를 만들어 가겠습니다. ##
-\n@Qtum : QXoPcHjx51m92qc4mpFwBSbbmKp4oVn9nt
-\n@myetherwallet : 0xd585CbfBB7b0ADf690A524E3fED146b35d5eE90c";
+$support_wallet = "\n## 여러분의 후원으로 더 좋은 알람 서비스를 만들어 가겠습니다. ##\n@Qtum : QXoPcHjx51m92qc4mpFwBSbbmKp4oVn9nt \n@myetherwallet : 0xd585CbfBB7b0ADf690A524E3fED146b35d5eE90c \n@myetherwallet2 : 0xD56442fE9a2d627BE3c27B7735B416fDB4719728";
 
 for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $url = 'https://api-manager.upbit.com/api/v1/notices/' . $i;
@@ -30,7 +28,7 @@ for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $result = json_decode($response);
 
     if ($result->success === true) {
-        $message = "## 업비트 새로운 공지##\n";
+        $message = "## 업비트 새로운 공지 ##\n";
         $message = $message.$result->data->title."\n";
         $message = $message.$result->data->body."\n";
         $message = $message.$support_wallet;
