@@ -7,12 +7,16 @@ require_once MAX_PATH . '/conf.php';
 require_once MAX_PATH . '/handle/UrlJsonParser.php';
 
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
-$sql = 'select * from upbit order by row_number desc limit 1';
+$sql = 'select * from upbit_n order by row_number desc limit 1';
 $len = $db->query($sql)->fetch_all();
 $len = $len[0][0];
 date_default_timezone_set('UTC');
 $date = strtotime('now');
 $date = date('Y-m-d H:i:s', $date);
+
+$support_wallet = "\n\n## 여러분의 후원으로 더 좋은 알람 서비스를 만들어 가겠습니다. ##
+\n@Qtum : QXoPcHjx51m92qc4mpFwBSbbmKp4oVn9nt
+\n@myetherwallet : 0xd585CbfBB7b0ADf690A524E3fED146b35d5eE90c";
 
 for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $url = 'https://api-manager.upbit.com/api/v1/notices/' . $i;
@@ -29,15 +33,12 @@ for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
         $message = "## 업비트 새로운 공지##\n";
         $message = $message.$result->data->title."\n";
         $message = $message.$result->data->body."\n";
-        /* 그룹 */
-        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-        $telegram->telegramApiRequest("sendMessage", $message);
-        $sql = 'insert into upbit (row_number) VALUES ('.$i.')';
-        $db->query($sql);
+        $message = $message.$support_wallet;
 
-        /* 채널 */
-        $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
+        $sql = 'insert into upbit_n (row_number) VALUES ('.$i.')';
+        $db->query($sql);
     }
 }
 
@@ -51,19 +52,16 @@ $list = array();
 foreach ($result as $line) {
     if (preg_match($rex, $line)) {
         $list = preg_replace('/.*class="article-list-link">(.*)<\/a>/', '$1', $line);
-        $sql = 'select * from binance where contents="'.$list.'"';
+        $sql = 'select * from binance_n where contents="'.$list.'"';
         $isset = $db->query($sql)->fetch_all();
 
         if (empty($isset)) {
-            $sql = 'insert into binance (contents) VALUES ("'.$list.'")';
+            $sql = 'insert into binance_n (contents) VALUES ("'.$list.'")';
             $db->query($sql);
 
-            $message = "### 바이넨스 new lists ###\n\n$list\n\n$date";
-
-            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-            $telegram->telegramApiRequest("sendMessage", $message);
-
-            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+            $message = "### 바이넨스 new lists ###\n\n$list";
+            $message = $message.$support_wallet;
+            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
             $telegram->telegramApiRequest("sendMessage", $message);
         }
     }
@@ -86,10 +84,8 @@ foreach ($result as $line) {
         $contents =  strip_tags($contents);
         $contents = preg_replace('/(\t)/', '', $contents);
         $message = "### KuCoin new Announcement ###\n\n@".$list."\n".$contents."\n";
-        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-        $telegram->telegramApiRequest("sendMessage", $message);
-
-        $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+        $message = $message.$support_wallet;
+        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
 
         $new_article = false;
@@ -101,12 +97,12 @@ foreach ($result as $line) {
     }
     if (preg_match($rex, $line)) {
         $list = preg_replace($rex, '$1', $line);
-        $sql = 'select * from kucoin where contents="'.$list.'"';
+        $sql = 'select * from kucoin_n where contents="'.$list.'"';
         $isset = $db->query($sql)->fetch_all();
 
         if (empty($isset)) {
             $new_article = true;
-            $sql = 'insert into kucoin (contents) VALUES ("'.$list.'")';
+            $sql = 'insert into kucoin_n (contents) VALUES ("'.$list.'")';
             $db->query($sql);
         }
     }
@@ -123,19 +119,17 @@ foreach ($result as $line) {
         $list = preg_replace($rex, '$1', $line);
         $no = preg_replace('/.*href="http:\/\/bithumb.cafe\/archives\/(.*)".*>(.*)<\/a>$/', '$1', $line);
         if ($list !== '' && $list !== "더 보기") {
-            $sql = 'select * from bithumb where contents="'.$no.'"';
+            $sql = 'select * from bithumb_n where contents="'.$no.'"';
             $isset = $db->query($sql)->fetch_all();
 
             if (empty($isset)) {
-                $sql = 'insert into bithumb (contents) VALUES ("'.$no.'")';
+                $sql = 'insert into bithumb_n (contents) VALUES ("'.$no.'")';
                 $db->query($sql);
 
-                $message = "### bithumb new Announcement ###\n\n$list\n\n$date";
+                $message = "### bithumb new Announcement ###\n\n$list";
+                $message = $message.$support_wallet;
 
-                $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-                $telegram->telegramApiRequest("sendMessage", $message);
-
-                $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+                $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
                 $telegram->telegramApiRequest("sendMessage", $message);
             }
         }
