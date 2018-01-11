@@ -69,7 +69,7 @@ foreach ($result as $line) {
     }
 }
 
-$curl = $in->getCurl('https://news.kucoin.com/en/category/announcements/');
+$curl = $in->getCurl('https://news.kucoin.com/en/');
 
 $result = preg_split('/\n/',$curl);
 $rex = '/.*[^>]+.*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/';
