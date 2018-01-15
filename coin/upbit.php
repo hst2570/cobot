@@ -78,27 +78,27 @@ $new_article = false;
 $next = false;
 $contents = '';
 foreach ($result as $line) {
-    if ($new_article === true && preg_match('/.*div.*post-content.*/', $line)) {
-        $next = true;
-    }
-    if ($new_article === true && $next === true && preg_match('/.*<\/div>/', $line)) {
-
-        $contents =  strip_tags($contents);
-        $contents = preg_replace('/(\t)/', '', $contents);
-        $message = "### KuCoin new Announcement ###\n\n@".$list."\n".$contents."\n";
-        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
-        $telegram->telegramApiRequest("sendMessage", $message);
-
-        $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
-        $telegram->telegramApiRequest("sendMessage", $message);
-
-        $new_article = false;
-        $next = false;
-        $contents = '';
-    }
-    if ($next === true) {
-        $contents = $contents ."\n". $line;
-    }
+//    if ($new_article === true && preg_match('/.*div.*post-content.*/', $line)) {
+//        $next = true;
+//    }
+//    if ($new_article === true && $next === true && preg_match('/.*<\/div>/', $line)) {
+//
+//        $contents =  strip_tags($contents);
+//        $contents = preg_replace('/(\t)/', '', $contents);
+//        $message = "### KuCoin new Announcement ###\n\n@".$list."\n".$contents."\n";
+//        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+//        $telegram->telegramApiRequest("sendMessage", $message);
+//
+//        $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+//        $telegram->telegramApiRequest("sendMessage", $message);
+//
+//        $new_article = false;
+//        $next = false;
+//        $contents = '';
+//    }
+//    if ($next === true) {
+//        $contents = $contents ."\n". $line;
+//    }
     if (preg_match($rex, $line)) {
         $list = preg_replace($rex, '$1', $line);
         $sql = 'select * from kucoin where contents="'.$list.'"';
@@ -108,6 +108,12 @@ foreach ($result as $line) {
             $new_article = true;
             $sql = 'insert into kucoin (contents) VALUES ("'.$list.'")';
             $db->query($sql);
+            $message = "### KuCoin new Announcement ###\n\n@".$list."\n";
+            $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
+
+            $telegram->setGroupId($GLOBALS['TELEGRAM_CHANNEL_ID']);
+            $telegram->telegramApiRequest("sendMessage", $message);
         }
     }
 }
