@@ -32,4 +32,28 @@ class UrlJsonParser
         curl_setopt($handle, CURLOPT_TIMEOUT, 60);
         return curl_exec($handle);
     }
+
+    public function getPapago()
+    {
+        $url = "https://openapi.naver.com/v1/papago/n2mt";
+        $handle = curl_init($url);
+//        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+//        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+//        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+        curl_setopt($handle, CURLOPT_HEADER, "Content-Type: application/x-www-form-urlencoded;charset=UTF-8");
+        curl_setopt($handle, CURLOPT_HEADER, "X-Naver-Client-Id: 6OZZQQgUoBTAspqaiBvp");
+        curl_setopt($handle, CURLOPT_HEADER, "X-Naver-Client-Secret: e15HFBMjul");
+        curl_setopt($handle, CURLOPT_POST, "source=ko&target=en&text=만나서 반갑습니다.");
+//        curl_setopt($handle, CURLOPT_HEADER, "X-Naver-Client-Id: 6OZZQQgUoBTAspqaiBvp");
+//        curl_setopt($handle, CURLOPT_HEADER, "X-Naver-Client-Secret: e15HFBMjul");
+        return curl_exec($handle);
+    }
 }
+
+//curl "https://openapi.naver.com/v1/papago/n2mt" \
+//-H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
+//-H "X-Naver-Client-Id: 6OZZQQgUoBTAspqaiBvp" \
+//-H "X-Naver-Client-Secret: e15HFBMjul" \
+//-d "source=ko&target=en&text=만나서 반갑습니다." -v
+//$a = UrlJsonParser::getInstance();
+//$a->getPapago();

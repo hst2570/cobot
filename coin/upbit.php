@@ -10,7 +10,7 @@ $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS[
 $sql = 'select * from upbit order by row_number desc limit 1';
 $len = $db->query($sql)->fetch_all();
 $len = $len[0][0];
-date_default_timezone_set('UTC');
+date_default_timezone_set('Asia/Seoul');
 $date = strtotime('now');
 $date = date('Y-m-d H:i:s', $date);
 
@@ -28,7 +28,7 @@ for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     if ($result->success === true) {
         $message = "## 업비트 새로운 공지##\n";
         $message = $message.$result->data->title."\n";
-        $message = $message.$result->data->body."\n";
+        $message = $message.$result->data->body."\n\n" . $date;
         /* 그룹 */
         $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
@@ -108,7 +108,7 @@ foreach ($result as $line) {
             $new_article = true;
             $sql = 'insert into kucoin (contents) VALUES ("'.$list.'")';
             $db->query($sql);
-            $message = "### KuCoin new Announcement ###\n\n@".$list."\n";
+            $message = "### KuCoin new Announcement ###\n\n@".$list."\n\n".$date;
             $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
             $telegram->telegramApiRequest("sendMessage", $message);
 
