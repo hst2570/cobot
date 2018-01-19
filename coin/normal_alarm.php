@@ -11,7 +11,7 @@ $sql = 'select * from upbit_n order by row_number desc limit 1';
 $len = $db->query($sql)->fetch_all();
 $len = $len[0][0];
 
-$support_wallet = "\n## 여러분의 후원으로 더 좋은 알람 서비스를 만들어 가겠습니다. ##\n@ Qtum: QXoPcHjx51m92qc4mpFwBSbbmKp4oVn9nt \n";
+$support_wallet = "\n\n## 여러분의 후원으로 더 좋은 알람 서비스를 만들어 가겠습니다. ##\n@ Qtum: QXoPcHjx51m92qc4mpFwBSbbmKp4oVn9nt \n";
 
 for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
     $url = 'https://api-manager.upbit.com/api/v1/notices/' . $i;
