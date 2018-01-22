@@ -13,7 +13,9 @@ class Marketcap
 
     public function get_markets($list)
     {
-        $name = preg_replace('/.*Lists.*\((.*)\).*/i', '$1', $list);
+        $name = preg_replace('/.*Lists(.*)\((.*)\).*/i', '$1', $list);
+        $name = trim($name);
+        $name = preg_replace('/( )/', '-', $name);
 
         $marketcap_url = 'https://coinmarketcap.com/currencies/'.$name;
         $curl = $this->curlParser->getCurl($marketcap_url);
@@ -31,7 +33,7 @@ class Marketcap
             }
 
             if ($flag === true && preg_match('/href="\/exchanges\//', $line)) {
-                $market = preg_replace('/.*href="\/exchanges\/.*>(.*)<\/a>.*/', '$1', $line);
+                $market = preg_replace('/.*href="\/exchanges\/.*>(.*)<\/a><\/td><td>.*/', '$1', $line);
                 $markets[$market] = $market;
             }
         }

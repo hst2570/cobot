@@ -49,11 +49,3 @@ class UrlJsonParser
         return curl_exec($handle);
     }
 }
-
-//curl "https://openapi.naver.com/v1/papago/n2mt" \
-//-H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
-//-H "X-Naver-Client-Id: 6OZZQQgUoBTAspqaiBvp" \
-//-H "X-Naver-Client-Secret: e15HFBMjul" \
-//-d "source=ko&target=en&text=만나서 반갑습니다." -v
-//$a = UrlJsonParser::getInstance();
-//$a->getPapago();
