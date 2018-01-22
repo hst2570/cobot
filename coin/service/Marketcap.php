@@ -17,7 +17,7 @@ class Marketcap
         $name = trim($name);
         $name = preg_replace('/( )/', '-', $name);
 
-        $marketcap_url = 'https://coinmarketcap.com/currencies/'.$name;
+        $marketcap_url = 'https://coinmarketcap.com/currencies/'.$name.'/';
         $curl = $this->curlParser->getCurl($marketcap_url);
         $result = preg_split('/\n/', $curl);
         $flag = false;
@@ -36,6 +36,10 @@ class Marketcap
                 $market = preg_replace('/.*href="\/exchanges\/.*>(.*)<\/a><\/td><td>.*/', '$1', $line);
                 $markets[$market] = $market;
             }
+        }
+
+        if (empty($markets)) {
+            return '알수없음';
         }
 
         return $markets;

@@ -77,7 +77,7 @@ class Alarm
     {
         $db = $this->db;
 
-        $sql = 'select * from alarm order by contents and site_type = "upbit" desc limit 1';
+        $sql = 'select * from alarm where site_type = "upbit" order by contents desc limit 1';
         $len = $db->query($sql)->fetch_all();
         $len = $len[0][0];
 
