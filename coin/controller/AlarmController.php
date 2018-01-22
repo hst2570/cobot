@@ -4,9 +4,18 @@ require_once MAX_PATH . '/service/Alarm.php';
 
 class AlarmController
 {
+    private $channel;
+    private $footer;
+
+    public function __construct($channel, $footer = '')
+    {
+        $this->channel = $channel;
+        $this->footer = $footer;
+    }
+
     public function start()
     {
-        $alarm = new Alarm($GLOBALS['TELEGRAM_GROUP_ID']);
+        $alarm = new Alarm($this->channel);
         $alarm->upbit('upbit');
 
         $sites = array(
@@ -36,7 +45,7 @@ class AlarmController
 
     public function start_normal()
     {
-        $alarm = new Alarm($GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
+        $alarm = new Alarm($GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID'], $this->footer);
         $alarm->upbit('upbit_normal');
 
         $sites = array(

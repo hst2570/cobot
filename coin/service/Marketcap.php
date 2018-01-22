@@ -39,7 +39,9 @@ class Marketcap
         }
 
         if (empty($markets)) {
-            return '알수없음';
+            return array(
+                '알수없음'
+            );
         }
 
         return $markets;

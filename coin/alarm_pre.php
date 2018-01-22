@@ -5,6 +5,8 @@ require_once MAX_PATH . '/env.php';
 require_once MAX_PATH . '/conf.php';
 require_once MAX_PATH . '/controller/AlarmController.php';
 
-$instance = new AlarmController();
+$instance = new AlarmController($GLOBALS['TELEGRAM_GROUP_ID']);
 $instance->start();
 
+$instance = new AlarmController($GLOBALS['TELEGRAM_CHANNEL_ID']);
+$instance->start();
