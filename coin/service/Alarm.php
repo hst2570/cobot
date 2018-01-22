@@ -24,12 +24,7 @@ class Alarm
     public function start_alarm_service($site_info)
     {
         $type = $site_info['type'];
-
-        if ($type === 'upbit') {
-            $this->upbit();
-        } else {
-            $this->crawling_type($site_info);
-        }
+        $this->crawling_type($site_info);
     }
 
     private function crawling_type($site_info)
@@ -73,11 +68,11 @@ class Alarm
         }
     }
 
-    public function upbit()
+    public function upbit($upbit)
     {
         $db = $this->db;
 
-        $sql = 'select * from alarm where site_type = "upbit" order by contents desc limit 1';
+        $sql = 'select * from alarm where site_type = "'.$upbit.'" order by contents desc limit 1';
         $len = $db->query($sql)->fetch_all();
         $len = $len[0][0];
 
@@ -99,7 +94,7 @@ class Alarm
 
                 $this->send_msg_to_telegram($message);
 
-                $sql = 'insert into alarm (contents, site_type) VALUES ("'.$i.'", "upbit")';
+                $sql = 'insert into alarm (contents, site_type) VALUES ("'.$i.'", "'.$upbit.'")';
                 $db->query($sql);
             }
         }
