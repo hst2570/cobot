@@ -63,7 +63,7 @@ class Alarm
                         $message = "### ".$type." new Announcement ###\n\n$list\n\n";
 
                         if (preg_match('/.*Lists.*\((.*)\).*/i', $list)) {
-                            $message = "exchange list\n".implode(', ', $this->Marketcap->get_markets($list));
+                            $message = $message."exchange list\n".implode(', ', $this->Marketcap->get_markets($list));
                         }
 
                         $this->send_msg_to_telegram($message);
