@@ -20,7 +20,7 @@ foreach ($binance_json as $item) {
     $coin_list[] = $item['assetName'];
 }
 
-if (!empty($collected_coin)) {
+if (!empty($sql_result)) {
     foreach ($sql_result as $item) {
         $collected_coin[$item[0]] = $item[0];
     }
@@ -33,7 +33,7 @@ foreach ($coin_list as $list) {
         $message = "## Binance new wallet ##\n*--------------*\n";
         $message = $message.$list."\n\n*--------------*";
 
-        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_GROUP_ID']);
+        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_CHANNEL_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
 
         $sql = 'insert into binance_new (id) values ("'.$list.'")';
