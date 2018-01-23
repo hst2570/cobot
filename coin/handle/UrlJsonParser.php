@@ -24,6 +24,13 @@ class UrlJsonParser
         return json_decode($response);
     }
 
+    public function getJsonToArray($url)
+    {
+        $response = $this->getCurl($url);
+
+        return json_decode($response, true);
+    }
+
     public function getCurl($url)
     {
         $handle = curl_init($url);
