@@ -94,7 +94,7 @@ class Alarm
                 $message = $message.$result->data->title."\n";
                 $message = $message.$result->data->body."\n";
 
-//                $this->send_msg_to_telegram($message);
+                $this->send_msg_to_telegram($message);
 
                 $sql = 'insert into alarm_num (id, site_type) VALUES ("'.$i.'", "'.$upbit.'")';
                 $db->query($sql);
@@ -123,22 +123,22 @@ class Alarm
             $lists = $result->data->items;
 
             if ($result->message === 'success') {
-                if ($lists->id === $len) {
+                if ($lists[0]->id === $len) {
                     return false;
                 } else {
                     foreach ($lists as $list) {
                         if ($len < $list->id) {
                             $message = "## huobi new Announcement  ##\n";
-                            $message = $message.$list->title."\n";
+                            $message = $message . $list->title . "\n";
                             $body_url = 'https://www.huobi.com/p/api/contents/pro/notice/1076';
 
                             $body = $this->curlParser->getJson($body_url);
                             $body = $body->data->content;
-                            $message = $message.strip_tags($body)."\n";
+                            $message = $message . strip_tags($body) . "\n";
 
-//                $this->send_msg_to_telegram($message);
+                            $this->send_msg_to_telegram($message);
 
-                            $sql = 'insert into alarm_num (id, site_type) VALUES ("'.$i.'", "'.$huobi.'")';
+                            $sql = 'insert into alarm_num (id, site_type) VALUES ("' . $i . '", "' . $huobi . '")';
                             $db->query($sql);
                         }
                     }
