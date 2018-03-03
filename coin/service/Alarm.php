@@ -123,7 +123,7 @@ class Alarm
             $lists = $result->data->items;
 
             if ($result->message === 'success') {
-                if ($lists[0]['id'] === $len) {
+                if ($lists->id === $len) {
                     return false;
                 } else {
                     foreach ($lists as $list) {
