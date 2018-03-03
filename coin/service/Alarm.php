@@ -23,7 +23,6 @@ class Alarm
 
     public function start_alarm_service($site_info)
     {
-        $type = $site_info['type'];
         $this->crawling_type($site_info);
     }
 
@@ -32,8 +31,10 @@ class Alarm
         $db = $this->db;
 
         $url = $site_info['url'];
-        $type = $site_info['type'];
+        $type = preg_replace('(.*)_normal(.*)', '$1$2', $site_info['type']);
         $rex = $site_info['rex'];
+        $send_flag = isset($site_info['send']) && $site_info['send'] === 1 ? false : true;
+
         if (isset($site_info['rex2'])) {
             $rex2 = $site_info['rex2'];
         } else {
@@ -60,8 +61,9 @@ class Alarm
                         if (preg_match('/.*Lists.*\((.*)\).*/i', $list)) {
                             $message = $message."exchange list\n".implode(', ', $this->Marketcap->get_markets($list));
                         }
-
-                        $this->send_msg_to_telegram($message);
+                        if ($send_flag === true) {
+                            $this->send_msg_to_telegram($message);
+                        }
                     }
                 }
             }
@@ -95,6 +97,39 @@ class Alarm
                 $this->send_msg_to_telegram($message);
 
                 $sql = 'insert into alarm (contents, site_type) VALUES ("'.$i.'", "'.$upbit.'")';
+                $db->query($sql);
+            }
+        }
+    }
+
+    public function huobi($huobi)
+    {
+        $db = $this->db;
+
+        $sql = 'select * from alarm where site_type = "'.$huobi.'" order by contents desc limit 1';
+        $len = $db->query($sql)->fetch_all();
+        $len = $len[0][0];
+
+        for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
+            $url = 'https://www.huobi.com/p/api/contents/pro/notice/' . $i;
+
+            $handle = curl_init($url);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+            $response = curl_exec($handle);
+
+            $result = json_decode($response);
+
+            if ($result->success === true) {
+                $message = "## huobi new Announcement  ##\n";
+                $message = $message.$result->data->title."\n";
+                $body = $result->data->content;
+                $message = $message.strip_tags($body)."\n";
+
+//                $this->send_msg_to_telegram($message);
+
+                $sql = 'insert into alarm (contents, site_type) VALUES ("'.$i.'", "'.$huobi.'")';
                 $db->query($sql);
             }
         }

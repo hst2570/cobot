@@ -17,6 +17,7 @@ class AlarmController
     {
         $alarm = new Alarm($this->channel);
         $alarm->upbit('upbit');
+        $alarm->huobi('huobi');
 
         $sites = array(
             'bithubm' => array(
@@ -31,10 +32,17 @@ class AlarmController
                 'rex'=>'/.*class="article-list-link">(.*)<\/a>/',
                 'rex2'=>'/.*class="article-list-link">(.*)<\/a>/'
             ),
-            'kucoin' => array(
-                'url'=>'https://news.kucoin.com/en/',
-                'type'=>'kucoin',
-                'rex'=>'/.*[^>].*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/',
+            'okex_coin' => array(
+                'url'=>'https://support.okex.com/hc/en-us/sections/115000447632-New-Token',
+                'type'=>'okex_coin',
+                'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
+                'send'=>1
+            ),
+            'okex_noti' => array(
+                'url'=>'https://support.okex.com/hc/en-us/sections/360000030652-Latest-Announcement',
+                'type'=>'okex_noti',
+                'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
+                'send'=>1
             )
         );
 
@@ -47,6 +55,7 @@ class AlarmController
     {
         $alarm = new Alarm($GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID'], $this->footer);
         $alarm->upbit('upbit_normal');
+        $alarm->huobi('huobi_normal');
 
         $sites = array(
             'bithubm_normal' => array(
@@ -65,6 +74,18 @@ class AlarmController
                 'url'=>'https://news.kucoin.com/en/',
                 'type'=>'kucoin_normal',
                 'rex'=>'/.*[^>].*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/',
+            ),
+            'okex_coin' => array(
+                'url'=>'https://support.okex.com/hc/en-us/sections/115000447632-New-Token',
+                'type'=>'okex_coin',
+                'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
+                'send'=>1
+            ),
+            'okex_noti' => array(
+                'url'=>'https://support.okex.com/hc/en-us/sections/360000030652-Latest-Announcement',
+                'type'=>'okex_noti',
+                'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
+                'send'=>1
             )
         );
 

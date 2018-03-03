@@ -56,3 +56,32 @@ class UrlJsonParser
         return curl_exec($handle);
     }
 }
+//$u = UrlJsonParser::getInstance();
+//$result = $u->getJson('https://www.huobi.com/p/api/contents/pro/notice/1076');
+//var_dump($result);
+//$rex = '/.*<a.*class="article-list-link">(.*)<\/a>/';
+//$rex2 = '/.*<a.*class="article-list-link">(.*)<\/a>/';
+//$type = 'OKEX';
+//
+//$result = preg_split('/\n/', $result);
+//
+//foreach ($result as $line) {
+//    if (preg_match($rex, $line)) {
+//        $list = preg_replace($rex, '$1', $line);
+//        $contents = preg_replace($rex2, '$1', $line);
+//
+//        if ($list !== '' && $list !== "더 보기") {
+//
+//            if (empty($isset)) {
+//                $message = "### ".$type." new Announcement ###\n\n$list\n\n";
+//
+//                if (preg_match('/.*Lists.*\((.*)\).*/i', $list)) {
+//                    $message = $message."exchange list\n".implode(', ', $this->Marketcap->get_markets($list));
+//                }
+//                var_dump($message);
+//
+////                $this->send_msg_to_telegram($message);
+//            }
+//        }
+//    }
+//}
