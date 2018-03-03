@@ -130,7 +130,7 @@ class Alarm
                         if ($len < $list->id) {
                             $message = "## huobi new Announcement  ##\n";
                             $message = $message . $list->title . "\n";
-                            $body_url = 'https://www.huobi.com/p/api/contents/pro/notice/1076';
+                            $body_url = 'https://www.huobi.com/p/api/contents/pro/notice/'.$list->id;
 
                             $body = $this->curlParser->getJson($body_url);
                             $body = $body->data->content;
