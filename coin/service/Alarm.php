@@ -31,7 +31,7 @@ class Alarm
         $db = $this->db;
 
         $url = $site_info['url'];
-        $type = preg_replace('(.*)_normal(.*)', '$1$2', $site_info['type']);
+        $type = $site_info['type'];
         $rex = $site_info['rex'];
         $send_flag = isset($site_info['send']) && $site_info['send'] === 1 ? false : true;
 
@@ -147,4 +147,3 @@ class Alarm
         $this->telegram->telegramApiRequest("sendMessage", $message);
     }
 }
-
