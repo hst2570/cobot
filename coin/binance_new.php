@@ -31,14 +31,17 @@ if (!empty($sql_result)) {
 foreach ($coin_list as $list) {
     $list = strtolower($list);
     if (!array_search($list, $collected_coin)) {
-
+        if(empty($list)){
+            continue;
+        }
         $message = "## Binance new wallet 🚀🚀🚀 ##\n*------------*\n";
         $message = $message.$list."\n*------------*\n";
         $message = $message."exchange list\n".implode(', ', $marketcap->get_markets($list));
 
         $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_CHANNEL_ID']);
         $telegram->telegramApiRequest("sendMessage", $message);
-
+        $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['TELEGRAM_NORMAL_CHANNEL_ID']);
+        $telegram->telegramApiRequest("sendMessage", $message);
         $sql = 'insert into binance_new (id) values ("'.$list.'")';
         $db->query($sql);
     }

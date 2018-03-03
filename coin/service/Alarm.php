@@ -143,7 +143,7 @@ class Alarm
 
     private function send_msg_to_telegram($message)
     {
-        $message = $message."\n\n".$this->footer;
+        $message = $message."\n".$this->footer;
         $this->telegram->telegramApiRequest("sendMessage", $message);
     }
 }
