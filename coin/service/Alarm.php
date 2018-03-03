@@ -127,7 +127,7 @@ class Alarm
                     return false;
                 } else {
                     foreach ($lists as $list) {
-                        if ($len < $list['id']) {
+                        if ($len < $list->id) {
                             $message = "## huobi new Announcement  ##\n";
                             $message = $message.$list->title."\n";
                             $body_url = 'https://www.huobi.com/p/api/contents/pro/notice/1076';
