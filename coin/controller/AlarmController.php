@@ -36,13 +36,11 @@ class AlarmController
                 'url'=>'https://support.okex.com/hc/en-us/sections/115000447632-New-Token',
                 'type'=>'okex_coin',
                 'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
-                'send'=>1
             ),
             'okex_noti' => array(
                 'url'=>'https://support.okex.com/hc/en-us/sections/360000030652-Latest-Announcement',
                 'type'=>'okex_noti',
                 'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
-                'send'=>1
             )
         );
 
@@ -77,15 +75,13 @@ class AlarmController
             ),
             'okex_coin' => array(
                 'url'=>'https://support.okex.com/hc/en-us/sections/115000447632-New-Token',
-                'type'=>'okex_coin',
+                'type'=>'okex_coin_normal',
                 'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
-                'send'=>1
             ),
             'okex_noti' => array(
                 'url'=>'https://support.okex.com/hc/en-us/sections/360000030652-Latest-Announcement',
-                'type'=>'okex_noti',
+                'type'=>'okex_noti_normal',
                 'rex'=>'/.*<a.*class="article-list-link">(.*)<\/a>/',
-                'send'=>1
             )
         );
 
