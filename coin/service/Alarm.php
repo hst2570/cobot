@@ -106,42 +106,33 @@ class Alarm
     {
         $db = $this->db;
 
-        $sql = 'select * from alarm_num where site_type = "'.$huobi.'" order by id desc limit 1';
-        $len = $db->query($sql)->fetch_all();
-        $len = $len[0][0];
+        $url = 'https://www.huobi.com/p/api/contents/pro/list_notice?limit=10&language=ko-kr';
 
-        for ($i = $len + 1 ; $i < $len + 10 ; $i++) {
-            $url = 'https://www.huobi.com/p/api/contents/pro/list_notice?limit=10&language=ko-kr';
+        $handle = curl_init($url);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+        $response = curl_exec($handle);
 
-            $handle = curl_init($url);
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-            curl_setopt($handle, CURLOPT_TIMEOUT, 60);
-            $response = curl_exec($handle);
+        $result = json_decode($response);
+        $lists = $result->data->topNotice;
 
-            $result = json_decode($response);
-            $lists = $result->data->items;
+        if ($result->message === 'success') {
+            foreach ($lists as $list) {
+                $sql = 'select * from alarm_num where site_type = "'.$huobi.'" order by id desc limit 1';
+                $len = $db->query($sql)->fetch_all();
+                $len = $len[0][0];
 
-            if ($result->message === 'success') {
-                if ($lists[0]->id === $len) {
-                    return false;
-                } else {
-                    foreach ($lists as $list) {
-                        if ($len < $list->id) {
-                            $message = "## huobi new Announcement  ##\n";
-                            $message = $message . $list->title . "\n";
-                            $body_url = 'https://www.huobi.com/p/api/contents/pro/notice/'.$list->id;
+                if ($len < $list->id) {
+                    $message = "## huobi new Announcement  ##\n";
+                    $message = $message . $list->title . "\n";
+                    $body = $list->content;
+                    $message = $message . strip_tags($body) . "\n";
 
-                            $body = $this->curlParser->getJson($body_url);
-                            $body = $body->data->content;
-                            $message = $message . strip_tags($body) . "\n";
+                    $this->send_msg_to_telegram($message);
 
-                            $this->send_msg_to_telegram($message);
-
-                            $sql = 'insert into alarm_num (id, site_type) VALUES ("' . $i . '", "' . $huobi . '")';
-                            $db->query($sql);
-                        }
-                    }
+                    $sql = 'insert into alarm_num (id, site_type) VALUES ("' . $list->id . '", "' . $huobi . '")';
+                    $db->query($sql);
                 }
             }
         }
