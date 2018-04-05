@@ -56,9 +56,14 @@ class UrlJsonParser
         return curl_exec($handle);
     }
 }
-//$u = UrlJsonParser::getInstance();
-//$result = $u->getJson('https://www.huobi.com/p/api/contents/pro/notice/1076');
-//var_dump($result);
+$u = UrlJsonParser::getInstance();
+$result = $u->getJson('https://ccx.upbit.com/api/v1/market_status/all');
+var_dump($result);
+
+foreach ($result as $item) {
+    $id = $item['id'];
+    $name = $item['name'];
+}
 //$rex = '/.*<a.*class="article-list-link">(.*)<\/a>/';
 //$rex2 = '/.*<a.*class="article-list-link">(.*)<\/a>/';
 //$type = 'OKEX';
