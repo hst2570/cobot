@@ -106,7 +106,7 @@ class Alarm
     {
         $db = $this->db;
 
-        $url = 'https://www.huobi.com/p/api/contents/pro/list_notice?limit=10&language=ko-kr';
+        $url = 'https://www.huobi.com/p/api/contents/pro/list_notice?limit=1&language=ko-kr';
 
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -115,7 +115,7 @@ class Alarm
         $response = curl_exec($handle);
 
         $result = json_decode($response);
-        $lists = $result->data->topNotice;
+        $lists = $result->data->items;
 
         if ($result->message === 'success') {
             foreach ($lists as $list) {

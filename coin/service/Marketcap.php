@@ -34,7 +34,7 @@ class Marketcap
 
             if ($flag === true && preg_match('/href="\/exchanges\//', $line)) {
                 $market = preg_replace('/.*href="\/exchanges\/.*>(.*)<\/a><\/td><td>.*/', '$1', $line);
-                $markets[$market] = $market;
+                $markets[$market] = strip_tags($market);
             }
         }
 
