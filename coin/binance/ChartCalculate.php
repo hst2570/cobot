@@ -250,9 +250,10 @@ class ChartCalculate
     {
         $size = sizeof($rHigh) - 1;
         $band = [];
-
         for ($i = $size ; $i > 0 ; $i--) {
-            $band = $rHigh[$size] - $rRow[$size];
+            if (isset($rHigh[$size]) && isset($rRow[$size])) {
+                $band[] = $rHigh[$size] - $rRow[$size];
+            }
         }
 
         return $band;

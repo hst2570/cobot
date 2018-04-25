@@ -75,14 +75,14 @@ foreach ($symbols as $symbol) {
         $q = round(($my_btc * 0.10) / $current_price, 4);
 
         $result = $api->test_order([
-            'symbol' => 'EOSBTC',
+            'symbol' => $symbol,
             'side' => 'BUY',
             'type' => 'MARKET',
             'quantity' => $q,
             'recvWindow' => '5000',
             'timestamp' => $now.'000',
             'signature' => hash_hmac('sha256', http_build_query([
-                'symbol' => 'EOSBTC',
+                'symbol' => $symbol,
                 'side' => 'BUY',
                 'type' => 'MARKET',
                 'quantity' => $q,
@@ -90,7 +90,7 @@ foreach ($symbols as $symbol) {
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
-
+        echo "Buy \n\n\n";
         $sql = 'insert into binance_trade 
                 (symbol, buy_price, quantity, status, sell_price) values 
                 ("'.$symbol.'", "'.$current_price.'", "'.$q.'", "buy", "")';
