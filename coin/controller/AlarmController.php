@@ -17,7 +17,7 @@ class AlarmController
     {
         $alarm = new Alarm($this->channel);
         $alarm->upbit('upbit');
-        $alarm->huobi('huobi');
+//        $alarm->huobi('huobi');
 
         $sites = array(
             'bithubm' => array(
@@ -68,11 +68,11 @@ class AlarmController
                 'rex'=>'/.*class="article-list-link">(.*)<\/a>/',
                 'rex2'=>'/.*class="article-list-link">(.*)<\/a>/'
             ),
-            'kucoin_normal' => array(
-                'url'=>'https://news.kucoin.com/en/',
-                'type'=>'kucoin_normal',
-                'rex'=>'/.*[^>].*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/',
-            ),
+//            'kucoin_normal' => array(
+//                'url'=>'https://news.kucoin.com/en/',
+//                'type'=>'kucoin_normal',
+//                'rex'=>'/.*[^>].*href="https:\/\/news.kucoin.com\/en.*>(.*)<\/a>$/',
+//            ),
             'okex_coin' => array(
                 'url'=>'https://support.okex.com/hc/en-us/sections/115000447632-New-Token',
                 'type'=>'okex_coin_normal',
