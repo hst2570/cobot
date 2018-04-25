@@ -92,8 +92,8 @@ foreach ($symbols as $symbol) {
         ]);
         echo "Buy \n\n\n";
         $sql = 'insert into binance_trade 
-                (symbol, buy_price, quantity, status, sell_price) values 
-                ("'.$symbol.'", "'.$current_price.'", "'.$q.'", "buy", "")';
+                (symbol, buy_price, quantity, status) values 
+                ("'.$symbol.'", '.$current_price.', '.$q.', "buy")';
 
         $db->query($sql);
     }
