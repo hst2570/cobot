@@ -246,7 +246,7 @@ class ChartCalculate
         return true;
     }
 
-    private function avg($array)
+    public function avg($array)
     {
         $sum = 0;
         foreach ($array as $a) {

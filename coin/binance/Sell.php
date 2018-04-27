@@ -2,12 +2,12 @@
 define('MAX_PATH',dirname(dirname(dirname(__FILE__))));
 require_once MAX_PATH . '/coin/env.php';
 require_once MAX_PATH . '/coin/conf.php';
-require_once MAX_PATH . '/coin/binance/ChartCalculate.php';
+require_once MAX_PATH . '/coin/binance/SellCondition.php';
 require_once MAX_PATH . '/coin/binance/ApiCall.php';
 require_once MAX_PATH . '/coin/handle/Telegram.php';
 
-$calculate = new ChartCalculate();
 $api = new ApiCall();
+$sell_condition = new SellCondition();
 
 $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
 
@@ -33,28 +33,29 @@ while ($row = $list->fetch_assoc()) {
     $current_price = $current_coin_info['bidPrice'];
 
     if ($current_price > $buy_price * 1.035) {
-        $result = $api->test_order([
-            'symbol' => $symbol,
-            'side' => 'SELL',
-            'type' => 'MARKET',
-            'quantity' => $q,
-            'timestamp' => $now.'000',
-            'signature' => hash_hmac('sha256', http_build_query([
+        if ($sell_condition->is_sell($symbol)) {
+            $result = $api->test_order([
                 'symbol' => $symbol,
                 'side' => 'SELL',
                 'type' => 'MARKET',
                 'quantity' => $q,
                 'timestamp' => $now.'000',
-            ]), $private_key)
-        ]);
+                'signature' => hash_hmac('sha256', http_build_query([
+                    'symbol' => $symbol,
+                    'side' => 'SELL',
+                    'type' => 'MARKET',
+                    'quantity' => $q,
+                    'timestamp' => $now.'000',
+                ]), $private_key)
+            ]);
 
-        $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
+            $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
                 where id='.$row['id'];
 
-        $db->query($sql);
-        $telegram->telegramApiRequest("sendMessage", '
+            $db->query($sql);
+            $telegram->telegramApiRequest("sendMessage", '
             일반 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
-        echo "Sell\n\n\n";
+        }
     }
 
     if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.95) {
