@@ -23,24 +23,6 @@ $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
 $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
 $symbol_data = $api->test_symbol();
 
-$my_account = $api->test_account([
-    'recvWindow' => '5000',
-    'timestamp' => $now.'000',
-    'signature' => hash_hmac('sha256', http_build_query([
-        'recvWindow' => '5000',
-        'timestamp' => $now.'000',
-    ]), $private_key)
-]);
-
-$my_account = $my_account['balances'];
-$my_coin = [];
-
-foreach ($my_account as $coin) {
-    $my_coin[$coin['asset']] = $coin['free'];
-}
-$my_btc = $my_coin['BTC'];
-unset($my_coin['BTC']);
-
 $symbols = [];
 foreach ($symbol_data['data'] as $data) {
     if ($data['status'] === 'TRADING' && preg_match('/.*BTC$/', $data['symbol'])) {
@@ -56,6 +38,24 @@ foreach ($symbols as $symbol) {
     $Rsi = [];
     $cci = [];
 
+    $my_account = $api->test_account([
+        'recvWindow' => '5000',
+        'timestamp' => $now.'000',
+        'signature' => hash_hmac('sha256', http_build_query([
+            'recvWindow' => '5000',
+            'timestamp' => $now.'000',
+        ]), $private_key)
+    ]);
+
+    $my_account = $my_account['balances'];
+    $my_coin = [];
+
+    foreach ($my_account as $coin) {
+        $my_coin[$coin['asset']] = $coin['free'];
+    }
+    $my_btc = $my_coin['BTC'];
+    unset($my_coin['BTC']);
+    
     foreach ($intervals as $interval) {
         $calculate->setCoin($interval, $symbol);
         $AvgMove[$interval] = $calculate->getAvgMove();
