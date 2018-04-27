@@ -77,6 +77,9 @@ foreach ($symbols as $symbol) {
         $current_price = $current_coin_info['askPrice'];
 
         $q = round(($my_btc * 0.30) / $current_price, 4);
+        if ($q > 10) {
+            $q = round(($my_btc * 0.30) / $current_price, 0);
+        }
         if ($lot_size[$symbol] > $q) {
             echo "최소 거래량 미스: ".$lot_size[$symbol]." :: ".$q."\n";
             continue;
