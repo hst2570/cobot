@@ -28,7 +28,7 @@ foreach ($symbol_data['data'] as $data) {
         $lot_size[$data['symbol']] = $data['minTrade'];
     }
 }
-
+var_dump($symbol_data);
 foreach ($symbols as $symbol) {
     $AvgMove = [];
     $AvgPrice = [];
@@ -110,5 +110,5 @@ foreach ($symbols as $symbol) {
             구매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         }
     }
-    sleep(0.5);
+    sleep(1);
 }

@@ -209,34 +209,34 @@ class ChartCalculate
             if ($i < 0) {
                 break;
             }
-            if (!$avgPrice[$size_of_avg_price] * 0.10 < $bolland[$i]) {
+            if (!$avgPrice[$size_of_avg_price] * 0.15 < $bolland[$i]) {
                 echo "NOT 행보 중\n";
                 return false;
             }
         }
 
-        if ($rsi_4h_avg * 0.65 > $rsi_4h &&
-            $rsi_1h_avg * 0.60 > $rsi_1h &&
-            $rsi_15m_avg * 0.60 > $rsi_15m) {
+        if ($rsi_4h_avg * 0.55 > $rsi_4h &&
+            $rsi_1h_avg * 0.50 > $rsi_1h &&
+            $rsi_15m_avg * 0.50 > $rsi_15m) {
             echo "1-1 pass\n";
-        } else if ($rsi_1h_avg * 0.60 > $rsi_1h &&
-            $rsi_15m_avg * 0.60 > $rsi_15m) {
+        } else if ($rsi_1h_avg * 0.50 > $rsi_1h &&
+            $rsi_15m_avg * 0.50 > $rsi_15m) {
             echo "1-2 pass\n";
-        } else if ($rsi_15m_avg * 0.55 > $rsi_15m) {
+        } else if ($rsi_15m_avg * 0.45 > $rsi_15m) {
             echo "1-3 pass\n";
         } else {
             echo "1 break\n";
             return false;
         }
 
-        if ($cci_4h_avg * 0.65 > $cci_4h &&
-            $cci_1h_avg * 0.60 > $cci_1h &&
-            $cci_15m_avg * 0.60 > $cci_15m) {
+        if ($cci_4h_avg * 0.55 > $cci_4h &&
+            $cci_1h_avg * 0.50 > $cci_1h &&
+            $cci_15m_avg * 0.50 > $cci_15m) {
             echo "2-1 pass\n";
-        } else if ($cci_1h_avg * 0.60 > $cci_1h &&
-            $cci_15m_avg * 0.60 > $cci_15m) {
+        } else if ($cci_1h_avg * 0.50 > $cci_1h &&
+            $cci_15m_avg * 0.50 > $cci_15m) {
             echo "2-2 pass\n";
-        } else if ($cci_15m_avg * 0.55 > $cci_15m) {
+        } else if ($cci_15m_avg * 0.45 > $cci_15m) {
             echo "2-3 pass\n";
         } else {
             echo "2 break\n";

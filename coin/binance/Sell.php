@@ -55,4 +55,30 @@ while ($row = $list->fetch_assoc()) {
             판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         echo "Sell\n\n\n";
     }
+
+    if ($current_price < $buy_price * 0.97) {
+        $result = $api->test_order([
+            'symbol' => $symbol,
+            'side' => 'SELL',
+            'type' => 'MARKET',
+            'quantity' => $q,
+            'timestamp' => $now.'000',
+            'signature' => hash_hmac('sha256', http_build_query([
+                'symbol' => $symbol,
+                'side' => 'SELL',
+                'type' => 'MARKET',
+                'quantity' => $q,
+                'timestamp' => $now.'000',
+            ]), $private_key)
+        ]);
+
+        $sql = 'update binance_trade set status="sell" and sell_price='.$current_price.'
+                where id='.$row['id'];
+
+        $db->query($sql);
+        $telegram->telegramApiRequest("sendMessage", '
+            판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+        echo "Sell\n\n\n";
+    }
+    sleep(0.5);
 }
