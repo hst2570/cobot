@@ -48,7 +48,7 @@ while ($row = $list->fetch_assoc()) {
             ]), $private_key)
         ]);
 
-        $sql = 'update binance_trade set status="sell" and sell_price='.$current_price.'
+        $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
                 where id='.$row['id'];
 
         $db->query($sql);
@@ -73,7 +73,7 @@ while ($row = $list->fetch_assoc()) {
             ]), $private_key)
         ]);
 
-        $sql = 'update binance_trade set status="sell" and sell_price='.$current_price.'
+        $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
                 where id='.$row['id'];
 
         $db->query($sql);

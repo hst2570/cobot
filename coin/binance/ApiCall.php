@@ -1,4 +1,7 @@
 <?php
+//
+define('MAX_PATH',dirname(dirname(dirname(__FILE__))));
+require_once MAX_PATH . '/coin/env.php';
 
 class ApiCall
 {
