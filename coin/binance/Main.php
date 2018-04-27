@@ -110,4 +110,5 @@ foreach ($symbols as $symbol) {
             구매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         }
     }
+    sleep(0.5);
 }
