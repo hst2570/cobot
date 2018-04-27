@@ -203,34 +203,40 @@ class ChartCalculate
         $cci_15m = $cci['15m'][sizeof($cci['15m']) - 1];
 
         $bolland = $this->bolland($rHigh, $rRow);
+        $size_of_avg_price = sizeof($avgPrice) - 1;
 
-        if ($rsi_4h_avg * 0.40 > $rsi_4h &&
-            $rsi_1h_avg * 0.35 > $rsi_1h &&
-            $rsi_15m_avg * 0.35 > $rsi_15m) {
+        for ($i = sizeof($bolland) - 1 ; $i > sizeof($bolland) - 10 ; $i--) {
+            if (!$avgPrice[$size_of_avg_price] * 0.10 < $bolland[$i]) {
+                echo "NOT 행보 중\n";
+                return false;
+            }
+        }
 
-        } else if ($rsi_1h_avg * 0.30 > $rsi_1h &&
-            $rsi_15m_avg * 0.30 > $rsi_15m) {
-
-        } else if ($rsi_15m_avg * 0.25 > $rsi_15m) {
-
+        if ($rsi_4h_avg * 0.8 > $rsi_4h &&
+            $rsi_1h_avg * 0.85 > $rsi_1h &&
+            $rsi_15m_avg * 0.85 > $rsi_15m) {
+            echo "1-1 pass\n";
+        } else if ($rsi_1h_avg * 0.80 > $rsi_1h &&
+            $rsi_15m_avg * 0.80 > $rsi_15m) {
+            echo "1-2 pass\n";
+        } else if ($rsi_15m_avg * 0.75 > $rsi_15m) {
+            echo "1-3 pass\n";
         } else {
+            echo "1 break\n";
             return false;
         }
 
-        if ($cci_4h_avg * 0.40 > $cci_4h &&
-            $cci_1h_avg * 0.35 > $cci_1h &&
-            $cci_15m_avg * 0.35 > $cci_15m) {
-
-        } else if ($cci_1h_avg * 0.30 > $cci_1h &&
-            $cci_15m_avg * 0.30 > $cci_15m) {
-
-        } else if ($cci_15m_avg * 0.25 > $cci_15m) {
-
+        if ($cci_4h_avg * 0.85 > $cci_4h &&
+            $cci_1h_avg * 0.80 > $cci_1h &&
+            $cci_15m_avg * 0.80 > $cci_15m) {
+            echo "2-1 pass\n";
+        } else if ($cci_1h_avg * 0.80 > $cci_1h &&
+            $cci_15m_avg * 0.80 > $cci_15m) {
+            echo "2-2 pass\n";
+        } else if ($cci_15m_avg * 0.75 > $cci_15m) {
+            echo "2-3 pass\n";
         } else {
-            return false;
-        }
-
-        if ($bolland[sizeof($bolland) - 1] > $avgPrice[sizeof($avgPrice) - 1]) {
+            echo "2 break\n";
             return false;
         }
 
@@ -250,9 +256,10 @@ class ChartCalculate
     {
         $size = sizeof($rHigh) - 1;
         $band = [];
+
         for ($i = $size ; $i > 0 ; $i--) {
-            if (isset($rHigh[$size]) && isset($rRow[$size])) {
-                $band[] = $rHigh[$size] - $rRow[$size];
+            if (isset($rHigh[$i]) && isset($rRow[$i])) {
+                $band[] = $rHigh[$i] - $rRow[$i];
             }
         }
 
