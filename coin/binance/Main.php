@@ -15,18 +15,15 @@ $intervals = [
     '4h'
 ];
 
-$now = $api->test_time();
-$now = json_decode($now, true);
-$now = $now['serverTime'];
-$now = preg_replace('/([0-9]{10}).*/', '$1', $now);
-
 $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
 $symbol_data = $api->test_symbol();
 
 $symbols = [];
+$lot_size = [];
 foreach ($symbol_data['data'] as $data) {
     if ($data['status'] === 'TRADING' && preg_match('/.*BTC$/', $data['symbol'])) {
         $symbols[] = $data['symbol'];
+        $lot_size[$data['symbol']] = $data['minTrade'];
     }
 }
 
@@ -37,6 +34,11 @@ foreach ($symbols as $symbol) {
     $RRow = [];
     $Rsi = [];
     $cci = [];
+
+    $now = $api->test_time();
+    $now = json_decode($now, true);
+    $now = $now['serverTime'];
+    $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
 
     $my_account = $api->test_account([
         'recvWindow' => '5000',
@@ -73,7 +75,10 @@ foreach ($symbols as $symbol) {
         $current_price = $current_coin_info['askPrice'];
 
         $q = round(($my_btc * 0.10) / $current_price, 4);
-
+        if ($lot_size[$symbol] > $q) {
+            echo "최소 거래량 미스: ".$lot_size[$symbol]." :: ".$q."\n";
+            continue;
+        }
         $result = $api->test_order([
             'symbol' => $symbol,
             'side' => 'BUY',
@@ -88,15 +93,16 @@ foreach ($symbols as $symbol) {
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
+        var_dump($result);
         if (isset($result['code'])) {
             echo "error!!";
-            var_dump($result);
-        }
-        echo "Buy \n\n\n";
-        $sql = 'insert into binance_trade 
+        } else {
+            echo "Buy \n\n\n";
+            $sql = 'insert into binance_trade 
                 (symbol, buy_price, quantity, status) values 
                 ("'.$symbol.'", '.$current_price.', '.$q.', "buy")';
 
-        $db->query($sql);
+            $db->query($sql);
+        }
     }
 }
