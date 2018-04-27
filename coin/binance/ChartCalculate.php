@@ -215,28 +215,28 @@ class ChartCalculate
             }
         }
 
-        if ($rsi_4h_avg * 0.55 > $rsi_4h &&
-            $rsi_1h_avg * 0.50 > $rsi_1h &&
-            $rsi_15m_avg * 0.50 > $rsi_15m) {
+        if ($rsi_4h_avg * 0.45 > $rsi_4h &&
+            $rsi_1h_avg * 0.40 > $rsi_1h &&
+            $rsi_15m_avg * 0.40 > $rsi_15m) {
             echo "1-1 pass\n";
-        } else if ($rsi_1h_avg * 0.50 > $rsi_1h &&
-            $rsi_15m_avg * 0.50 > $rsi_15m) {
+        } else if ($rsi_1h_avg * 0.40 > $rsi_1h &&
+            $rsi_15m_avg * 0.40 > $rsi_15m) {
             echo "1-2 pass\n";
-        } else if ($rsi_15m_avg * 0.45 > $rsi_15m) {
+        } else if ($rsi_15m_avg * 0.35 > $rsi_15m) {
             echo "1-3 pass\n";
         } else {
             echo "1 break\n";
             return false;
         }
 
-        if ($cci_4h_avg * 0.55 > $cci_4h &&
-            $cci_1h_avg * 0.50 > $cci_1h &&
-            $cci_15m_avg * 0.50 > $cci_15m) {
+        if ($cci_4h_avg * 0.45 > $cci_4h &&
+            $cci_1h_avg * 0.40 > $cci_1h &&
+            $cci_15m_avg * 0.40 > $cci_15m) {
             echo "2-1 pass\n";
-        } else if ($cci_1h_avg * 0.50 > $cci_1h &&
-            $cci_15m_avg * 0.50 > $cci_15m) {
+        } else if ($cci_1h_avg * 0.40 > $cci_1h &&
+            $cci_15m_avg * 0.40 > $cci_15m) {
             echo "2-2 pass\n";
-        } else if ($cci_15m_avg * 0.45 > $cci_15m) {
+        } else if ($cci_15m_avg * 0.35 > $cci_15m) {
             echo "2-3 pass\n";
         } else {
             echo "2 break\n";

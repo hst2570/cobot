@@ -28,7 +28,7 @@ foreach ($symbol_data['data'] as $data) {
         $lot_size[$data['symbol']] = $data['minTrade'];
     }
 }
-var_dump($symbol_data);
+
 foreach ($symbols as $symbol) {
     $AvgMove = [];
     $AvgPrice = [];
@@ -95,9 +95,11 @@ foreach ($symbols as $symbol) {
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
-        var_dump($result);
+
         if (isset($result['code'])) {
-            echo "error!!";
+            echo $symbol.": error!!\n";
+            echo $q."\n";
+            echo $lot_size[$symbol]."\n";
         } else {
             echo "Buy \n\n\n";
             $sql = 'insert into binance_trade 
