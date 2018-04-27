@@ -79,17 +79,19 @@ foreach ($symbols as $symbol) {
             'side' => 'BUY',
             'type' => 'MARKET',
             'quantity' => $q,
-            'recvWindow' => '5000',
             'timestamp' => $now.'000',
             'signature' => hash_hmac('sha256', http_build_query([
                 'symbol' => $symbol,
                 'side' => 'BUY',
                 'type' => 'MARKET',
                 'quantity' => $q,
-                'recvWindow' => '5000',
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
+        if (isset($result['code'])) {
+            echo "error!!";
+            var_dump($result);
+        }
         echo "Buy \n\n\n";
         $sql = 'insert into binance_trade 
                 (symbol, buy_price, quantity, status) values 

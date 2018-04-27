@@ -36,14 +36,12 @@ while ($row = $list->fetch_assoc()) {
             'side' => 'SELL',
             'type' => 'MARKET',
             'quantity' => $q,
-            'recvWindow' => '5000',
             'timestamp' => $now.'000',
             'signature' => hash_hmac('sha256', http_build_query([
                 'symbol' => $symbol,
                 'side' => 'SELL',
                 'type' => 'MARKET',
                 'quantity' => $q,
-                'recvWindow' => '5000',
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
