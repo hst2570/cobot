@@ -16,6 +16,7 @@ $now = $now['serverTime'];
 $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
 
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
+$telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['BINANCE_TRADE_GROUP_ID']);
 $sql = 'select * from binance_trade where status = "buy"';
 
 $list = $db->query($sql);
@@ -30,7 +31,7 @@ while ($row = $list->fetch_assoc()) {
     ]);
     $current_price = $current_coin_info['bidPrice'];
 
-    if ($current_price > $buy_price * 1.05) {
+    if ($current_price > $buy_price * 1.035) {
         $result = $api->test_order([
             'symbol' => $symbol,
             'side' => 'SELL',
@@ -50,6 +51,8 @@ while ($row = $list->fetch_assoc()) {
                 where id='.$row['id'];
 
         $db->query($sql);
+        $telegram->telegramApiRequest("sendMessage", '
+            판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         echo "Sell\n\n\n";
     }
 }
