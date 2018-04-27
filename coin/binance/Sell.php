@@ -4,6 +4,7 @@ require_once MAX_PATH . '/coin/env.php';
 require_once MAX_PATH . '/coin/conf.php';
 require_once MAX_PATH . '/coin/binance/ChartCalculate.php';
 require_once MAX_PATH . '/coin/binance/ApiCall.php';
+require_once MAX_PATH . '/coin/handle/Telegram.php';
 
 $calculate = new ChartCalculate();
 $api = new ApiCall();
