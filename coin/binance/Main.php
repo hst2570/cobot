@@ -76,7 +76,7 @@ foreach ($symbols as $symbol) {
         ]);
         $current_price = $current_coin_info['askPrice'];
 
-        $q = round(($my_btc * 0.30) / $current_price, 4);
+        $q = round(($my_btc * 0.30) / $current_price, 3);
         if ($q > 10) {
             $q = round(($my_btc * 0.30) / $current_price, 0);
         }
