@@ -215,7 +215,7 @@ class ChartCalculate
             }
         }
 
-        if ($rsi_4h_avg > $rsi_4h &&
+        if ($rsi_4h_avg < $rsi_4h &&
             $rsi_1h_avg * 0.50 > $rsi_1h &&
             $rsi_15m_avg * 0.30 > $rsi_15m) {
             echo "1-1 pass\n";
@@ -229,7 +229,7 @@ class ChartCalculate
             return false;
         }
 
-        if ($cci_4h_avg > $cci_4h &&
+        if ($cci_4h_avg < $cci_4h &&
             $cci_1h_avg * 0.50 > $cci_1h &&
             $cci_15m_avg * 0.30 > $cci_15m) {
             echo "2-1 pass\n";
