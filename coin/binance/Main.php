@@ -4,10 +4,12 @@ require_once MAX_PATH . '/coin/env.php';
 require_once MAX_PATH . '/coin/conf.php';
 require_once MAX_PATH . '/coin/binance/ChartCalculate.php';
 require_once MAX_PATH . '/coin/binance/ApiCall.php';
+require_once MAX_PATH . '/coin/handle/Telegram.php';
 
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
 $calculate = new ChartCalculate();
 $api = new ApiCall();
+$telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['BINANCE_TRADE_GROUP_ID']);
 
 $intervals = [
     '15m',
@@ -103,6 +105,9 @@ foreach ($symbols as $symbol) {
                 ("'.$symbol.'", '.$current_price.', '.$q.', "buy")';
 
             $db->query($sql);
+
+            $telegram->telegramApiRequest("sendMessage", '
+            구매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         }
     }
 }
