@@ -53,11 +53,11 @@ while ($row = $list->fetch_assoc()) {
 
         $db->query($sql);
         $telegram->telegramApiRequest("sendMessage", '
-            판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+            일반 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         echo "Sell\n\n\n";
     }
 
-    if ($current_price < $buy_price * 0.97) {
+    if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.95) {
         $result = $api->test_order([
             'symbol' => $symbol,
             'side' => 'SELL',
@@ -78,7 +78,7 @@ while ($row = $list->fetch_assoc()) {
 
         $db->query($sql);
         $telegram->telegramApiRequest("sendMessage", '
-            판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+            !손절 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         echo "Sell\n\n\n";
     }
     sleep(0.5);
