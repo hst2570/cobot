@@ -18,11 +18,11 @@ class SellCondition
         $cci = $this->chartCalculate->getAvgCci();
         $rsi = $this->chartCalculate->getRsi();
 
-        if ($cci[sizeof($cci) - 1] > $this->chartCalculate->avg($cci)) {
+        if ($cci[sizeof($cci) - 1] < $this->chartCalculate->avg($cci)) {
             return true;
         }
 
-        if ($rsi[sizeof($rsi) - 1] > $this->chartCalculate->avg($rsi)) {
+        if ($rsi[sizeof($rsi) - 1] < $this->chartCalculate->avg($rsi)) {
             return true;
         }
 
