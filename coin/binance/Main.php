@@ -29,6 +29,28 @@ foreach ($symbol_data['data'] as $data) {
     }
 }
 
+$now = $api->test_time();
+$now = json_decode($now, true);
+$now = $now['serverTime'];
+$now = preg_replace('/([0-9]{10}).*/', '$1', $now);
+
+$my_account = $api->test_account([
+    'recvWindow' => '5000',
+    'timestamp' => $now.'000',
+    'signature' => hash_hmac('sha256', http_build_query([
+        'recvWindow' => '5000',
+        'timestamp' => $now.'000',
+    ]), $private_key)
+]);
+
+$my_account = $my_account['balances'];
+$my_coin = [];
+
+foreach ($my_account as $coin) {
+    $my_coin[$coin['asset']] = $coin['free'];
+}
+$my_btc = $my_coin['BTC'];
+
 foreach ($symbols as $symbol) {
     $AvgMove = [];
     $AvgPrice = [];
@@ -42,24 +64,6 @@ foreach ($symbols as $symbol) {
     $now = $now['serverTime'];
     $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
 
-    $my_account = $api->test_account([
-        'recvWindow' => '5000',
-        'timestamp' => $now.'000',
-        'signature' => hash_hmac('sha256', http_build_query([
-            'recvWindow' => '5000',
-            'timestamp' => $now.'000',
-        ]), $private_key)
-    ]);
-
-    $my_account = $my_account['balances'];
-    $my_coin = [];
-
-    foreach ($my_account as $coin) {
-        $my_coin[$coin['asset']] = $coin['free'];
-    }
-    $my_btc = $my_coin['BTC'];
-    unset($my_coin['BTC']);
-    
     foreach ($intervals as $interval) {
         $calculate->setCoin($interval, $symbol);
         $AvgMove[$interval] = $calculate->getAvgMove();
@@ -80,6 +84,9 @@ foreach ($symbols as $symbol) {
         if ($q > 10) {
             $q = round(($my_btc * 0.30) / $current_price, 0);
         }
+
+        $my_btc = $my_btc - ($current_price * $q);
+
         if ($lot_size[$symbol] > $q) {
             echo "최소 거래량 미스: ".$lot_size[$symbol]." :: ".$q."\n";
             continue;

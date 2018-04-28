@@ -8,18 +8,9 @@ require_once MAX_PATH . '/coin/handle/Telegram.php';
 
 $api = new ApiCall();
 $sell_condition = new SellCondition();
-
-$private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
-
-$now = $api->test_time();
-$now = json_decode($now, true);
-$now = $now['serverTime'];
-$now = preg_replace('/([0-9]{10}).*/', '$1', $now);
-
 $db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
-$telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['BINANCE_TRADE_GROUP_ID']);
-$sql = 'select * from binance_trade where status = "buy"';
 
+$sql = 'select * from binance_trade where status = "buy"';
 $list = $db->query($sql);
 
 while ($row = $list->fetch_assoc()) {
@@ -32,55 +23,54 @@ while ($row = $list->fetch_assoc()) {
     ]);
     $current_price = $current_coin_info['bidPrice'];
 
-    if ($current_price > $buy_price * 1.035) {
-        if ($sell_condition->is_sell($symbol)) {
-            $result = $api->test_order([
-                'symbol' => $symbol,
-                'side' => 'SELL',
-                'type' => 'MARKET',
-                'quantity' => $q,
-                'timestamp' => $now.'000',
-                'signature' => hash_hmac('sha256', http_build_query([
-                    'symbol' => $symbol,
-                    'side' => 'SELL',
-                    'type' => 'MARKET',
-                    'quantity' => $q,
-                    'timestamp' => $now.'000',
-                ]), $private_key)
-            ]);
-
-            $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
-                where id='.$row['id'];
-
-            $db->query($sql);
-            $telegram->telegramApiRequest("sendMessage", '
-            일반 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+    if ($current_price > $buy_price * 1.025) {
+        if (!$sell_condition->is_sell($symbol)) {
+            continue;
         }
+        sell($symbol, $q, $row['id'], $current_price, $db, '일반');
+    } else if ($current_price > $buy_price * 1.1) {
+        sell($symbol, $q, $row['id'], $current_price, $db, '고가격');
     }
 
     if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.95) {
-        $result = $api->test_order([
+        sell($symbol, $q, $row['id'], $current_price, $db, '손절');
+    }
+    sleep(0.5);
+}
+
+function sell($symbol, $q, $id, $current_price, $db, $type)
+{
+    $api = new ApiCall();
+    $telegram = new Telegram($GLOBALS['BOT_TOKEN'], $GLOBALS['BINANCE_TRADE_GROUP_ID']);
+    $now = $api->test_time();
+    $now = json_decode($now, true);
+    $now = $now['serverTime'];
+    $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
+    $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
+
+    $result = $api->test_order([
+        'symbol' => $symbol,
+        'side' => 'SELL',
+        'type' => 'MARKET',
+        'quantity' => $q,
+        'timestamp' => $now.'000',
+        'signature' => hash_hmac('sha256', http_build_query([
             'symbol' => $symbol,
             'side' => 'SELL',
             'type' => 'MARKET',
             'quantity' => $q,
             'timestamp' => $now.'000',
-            'signature' => hash_hmac('sha256', http_build_query([
-                'symbol' => $symbol,
-                'side' => 'SELL',
-                'type' => 'MARKET',
-                'quantity' => $q,
-                'timestamp' => $now.'000',
-            ]), $private_key)
-        ]);
+        ]), $private_key)
+    ]);
 
+    if (!isset($result['code'])) {
         $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
-                where id='.$row['id'];
+                where id='.$id;
 
         $db->query($sql);
-        $telegram->telegramApiRequest("sendMessage", '
-            !손절 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
-        echo "Sell\n\n\n";
+        $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+    } else {
+        $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+        var_dump($result);
     }
-    sleep(0.5);
 }
