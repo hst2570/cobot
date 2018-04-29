@@ -35,7 +35,7 @@ foreach ($my_account['balances'] as $balance) {
 
 while ($row = $list->fetch_assoc()) {
     $symbol = $row['symbol'];
-    $coin = preg_replace('/^(\w{2,6}BTC$)/', $symbol);
+    $coin = preg_replace('/^(\w{2,6}BTC$)/', '$1', $symbol);
     $buy_price = $row['buy_price'];
 
     $current_coin_info = $api->test_bookTicker([
