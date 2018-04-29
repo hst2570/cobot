@@ -23,7 +23,7 @@ while ($row = $list->fetch_assoc()) {
     ]);
     $current_price = $current_coin_info['bidPrice'];
 
-    if ($current_price > $buy_price * 1.025) {
+    if ($current_price > $buy_price * 1.03) {
         if (!$sell_condition->is_sell($symbol)) {
             continue;
         }
@@ -32,7 +32,7 @@ while ($row = $list->fetch_assoc()) {
         sell($symbol, $q, $row['id'], $current_price, $db, '고가격');
     }
 
-    if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.95) {
+    if ($current_price < $buy_price * 0.98 && $current_price > $buy_price * 0.97) {
         sell($symbol, $q, $row['id'], $current_price, $db, '손절');
     }
     sleep(0.5);
