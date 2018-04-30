@@ -93,7 +93,30 @@ function sell($symbol, $q, $current_price, $db, $type)
         $db->query($sql);
         $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
     } else {
-        $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
-        var_dump($result);
+        $q = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
+        $result = $api->test_order([
+            'symbol' => $symbol,
+            'side' => 'SELL',
+            'type' => 'MARKET',
+            'quantity' => $q,
+            'timestamp' => $now.'000',
+            'signature' => hash_hmac('sha256', http_build_query([
+                'symbol' => $symbol,
+                'side' => 'SELL',
+                'type' => 'MARKET',
+                'quantity' => $q,
+                'timestamp' => $now.'000',
+            ]), $private_key)
+        ]);
+        if (!isset($result['code'])) {
+            $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
+                where symbol='.$symbol;
+
+            $db->query($sql);
+            $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+        } else {
+            $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+            var_dump($result);
+        }
     }
 }
