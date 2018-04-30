@@ -54,7 +54,7 @@ while ($row = $list->fetch_assoc()) {
         sell($symbol, $q, $current_price, $db, '고가격');
     }
 
-    if ($current_price < $buy_price * 0.98 && $current_price > $buy_price * 0.97) {
+    if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.965) {
         sell($symbol, $q, $current_price, $db, '손절');
     }
     sleep(0.5);
@@ -69,6 +69,7 @@ function sell($symbol, $q, $current_price, $db, $type)
     $now = $now['serverTime'];
     $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
     $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
+    $q = round($q, 2);
 
     $result = $api->test_order([
         'symbol' => $symbol,
