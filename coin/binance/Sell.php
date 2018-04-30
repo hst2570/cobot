@@ -88,7 +88,7 @@ function sell($symbol, $q, $current_price, $db, $type)
 
     if (!isset($result['code'])) {
         $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
-                where symbol="'.$symbol.'"';
+                where symbol="'.$symbol.'" and status = "buy"';
 
         $db->query($sql);
         $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
@@ -110,7 +110,7 @@ function sell($symbol, $q, $current_price, $db, $type)
         ]);
         if (!isset($result['code'])) {
             $sql = 'update binance_trade set status="sell", sell_price='.$current_price.'
-                where symbol="'.$symbol.'"';
+                where symbol="'.$symbol.'" and status = "buy"';
 
             $db->query($sql);
             $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
