@@ -69,7 +69,7 @@ function sell($symbol, $q, $current_price, $db, $type)
     $now = $now['serverTime'];
     $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
     $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
-    $q = round($q, 2);
+    $q = preg_replace('/^(\d+)\.(\d{0,2}).*/', '$1.$2', $q);
 
     $result = $api->test_order([
         'symbol' => $symbol,
