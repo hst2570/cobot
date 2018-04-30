@@ -69,19 +69,19 @@ function sell($symbol, $q, $current_price, $db, $type)
     $now = $now['serverTime'];
     $now = preg_replace('/([0-9]{10}).*/', '$1', $now);
     $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
-    $q = preg_replace('/^(\d+)\.(\d{0,2}).*/', '$1.$2', $q);
+    $quantity = preg_replace('/^(\d+)\.(\d{0,2}).*/', '$1.$2', $q);
 
     $result = $api->test_order([
         'symbol' => $symbol,
         'side' => 'SELL',
         'type' => 'MARKET',
-        'quantity' => $q,
+        'quantity' => $quantity,
         'timestamp' => $now.'000',
         'signature' => hash_hmac('sha256', http_build_query([
             'symbol' => $symbol,
             'side' => 'SELL',
             'type' => 'MARKET',
-            'quantity' => $q,
+            'quantity' => $quantity,
             'timestamp' => $now.'000',
         ]), $private_key)
     ]);
@@ -93,18 +93,18 @@ function sell($symbol, $q, $current_price, $db, $type)
         $db->query($sql);
         $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
     } else {
-        $q = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
+        $quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
         $result = $api->test_order([
             'symbol' => $symbol,
             'side' => 'SELL',
             'type' => 'MARKET',
-            'quantity' => $q,
+            'quantity' => $quantity,
             'timestamp' => $now.'000',
             'signature' => hash_hmac('sha256', http_build_query([
                 'symbol' => $symbol,
                 'side' => 'SELL',
                 'type' => 'MARKET',
-                'quantity' => $q,
+                'quantity' => $quantity,
                 'timestamp' => $now.'000',
             ]), $private_key)
         ]);
