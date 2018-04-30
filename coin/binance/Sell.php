@@ -8,13 +8,10 @@ require_once MAX_PATH . '/coin/handle/Telegram.php';
 
 $api = new ApiCall();
 $sell_condition = new SellCondition();
-$q = 12.98700000;
-$quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
-var_dump($quantity);
-//$db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
-//
-//$sql = 'select * from binance_trade where status = "buy"';
-//$list = $db->query($sql);
+$db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
+
+$sql = 'select * from binance_trade where status = "buy"';
+$list = $db->query($sql);
 
 $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
 
