@@ -8,10 +8,13 @@ require_once MAX_PATH . '/coin/handle/Telegram.php';
 
 $api = new ApiCall();
 $sell_condition = new SellCondition();
-$db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
-
-$sql = 'select * from binance_trade where status = "buy"';
-$list = $db->query($sql);
+$q = 12.98700000;
+$quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
+var_dump($quantity);
+//$db = new mysqli($GLOBALS['database_host'], $GLOBALS['database_user'], $GLOBALS['database_password'], $GLOBALS['database_name']);
+//
+//$sql = 'select * from binance_trade where status = "buy"';
+//$list = $db->query($sql);
 
 $private_key = $GLOBALS['BINANCE_PRIVATE_KEY'];
 
@@ -91,9 +94,9 @@ function sell($symbol, $q, $current_price, $db, $type)
                 where symbol="'.$symbol.'"';
 
         $db->query($sql);
-        $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+        $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
     } else {
-        $quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1.$2', $q);
+        $quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1', $q);
         $result = $api->test_order([
             'symbol' => $symbol,
             'side' => 'SELL',
@@ -113,9 +116,9 @@ function sell($symbol, $q, $current_price, $db, $type)
                 where symbol="'.$symbol.'"';
 
             $db->query($sql);
-            $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+            $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
         } else {
-            $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+            $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
             var_dump($result);
         }
     }
