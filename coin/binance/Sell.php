@@ -55,6 +55,9 @@ while ($row = $list->fetch_assoc()) {
     }
 
     if ($current_price < $buy_price * 0.97 && $current_price > $buy_price * 0.965) {
+        if (!$sell_condition->is_sell($symbol)) {
+            continue;
+        }
         sell($symbol, $q, $current_price, $db, '손절');
     }
     sleep(0.5);
@@ -91,7 +94,7 @@ function sell($symbol, $q, $current_price, $db, $type)
                 where symbol="'.$symbol.'" and status = "buy"';
 
         $db->query($sql);
-        $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
+//        $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
     } else {
         $quantity = preg_replace('/^(\d+)\.(\d{0,1}).*/', '$1', $q);
         $result = $api->test_order([
@@ -113,7 +116,7 @@ function sell($symbol, $q, $current_price, $db, $type)
                 where symbol="'.$symbol.'" and status = "buy"';
 
             $db->query($sql);
-            $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
+//            $telegram->telegramApiRequest("sendMessage", $type.' 판매: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
         } else {
             $telegram->telegramApiRequest("sendMessage", $type.' 판매 실패: '.$symbol."\n갯수: ".$quantity."\n가격: ".$current_price);
             var_dump($result);

@@ -123,8 +123,8 @@ foreach ($symbols as $symbol) {
 
             $db->query($sql);
 
-            $telegram->telegramApiRequest("sendMessage", '
-            구매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
+//            $telegram->telegramApiRequest("sendMessage", '
+//            구매: '.$symbol."\n갯수: ".$q."\n가격: ".$current_price);
         }
     }
     sleep(1);
